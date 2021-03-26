@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.seyarada</groupId>
+    <artifactId>PandeLoot</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <repositories>
+
+        <!-- Spigot -->
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+
+        <!-- Oraxen -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
+        <!-- MythicMobs -->
+        <repository>
+            <id>zz_lumine-repo</id>
+            <url>http://mvn.lumine.io/repository/maven-releases/</url>
+        </repository>
+
+        <!-- discordsrv -->
+        <repository>
+            <id>Scarsz-Nexus</id>
+            <url>https://nexus.scarsz.me/content/groups/public/</url>
+        </repository>
+
+    </repositories>
+
+    <dependencies>
+
+        <!-- Spigot -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Oraxen -->
+        <dependency>
+            <groupId>com.github.Th0rgal</groupId>
+            <artifactId>Oraxen</artifactId>
+            <version>-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- MythicLib -->
+        <dependency>
+            <groupId>io.lumine.xikage</groupId>
+            <artifactId>MythicMobs</artifactId>
+            <version>4.11.0-BETA</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- MythicMobs -->
+        <dependency>
+            <groupId>io.lumine</groupId>
+            <artifactId>MythicLib</artifactId>
+            <version>1.0.6</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- MMOItems -->
+        <dependency>
+            <groupId>net.Indyuce</groupId>
+            <artifactId>MMOItems</artifactId>
+            <version>6.5.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjdk.nashorn</groupId>
+            <artifactId>nashorn-core</artifactId>
+            <version>15.0</version>
+        </dependency>
+
+        <!-- discordsrv -->
+        <dependency>
+            <groupId>com.discordsrv</groupId>
+            <artifactId>discordsrv</artifactId>
+            <version>1.21.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

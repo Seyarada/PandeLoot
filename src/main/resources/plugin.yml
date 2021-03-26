@@ -1,0 +1,9 @@
+name: Pandeloot
+main: net.seyarada.pandeloot.PandeLoot
+version: 0.1
+api-version: 1.13
+softdepend: [MythicMobs, MythicArtifacts, PlaceholderAPI, Vault, HoloBroadcast, MMOItems, Oraxen, DiscordSRV]
+commands:
+  pandeloot:
+    description: Your description
+    usage: /pandeloot
