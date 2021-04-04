@@ -8,11 +8,14 @@ import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
 import io.lumine.xikage.mythicmobs.skills.ITargetedLocationSkill;
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+
+import java.util.Collections;
 
 public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocationSkill, ITargetedEntitySkill, Listener {
 
@@ -46,8 +49,8 @@ public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocati
 
         RewardLine lineConfig = new RewardLine(i);
         Entity entity = BukkitAdapter.adapt(abstractEntity);
-        //if(entity instanceof Player)
-        //    new DropManager().doDrop((Player) entity, lineConfig);
+        if(entity instanceof Player)
+            new DropManager((Player) entity, BukkitAdapter.adapt(skillMetadata.getCaster().getLocation()), Collections.singletonList(lineConfig)).initDrops();
         //else
         //    new DropManager().doDrop(entity.getLocation(), lineConfig);
         return false;

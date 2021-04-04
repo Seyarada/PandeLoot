@@ -1,5 +1,6 @@
 package net.seyarada.pandeloot.rewards;
 
+import net.seyarada.pandeloot.Errors;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.drops.DropConditions;
 import org.bukkit.configuration.ConfigurationSection;
@@ -102,13 +103,13 @@ public class RewardContainer {
         RewardLine[] rollItems = items.toArray(new RewardLine[0]);
         double totalWeight = 0.0;
         for (RewardLine i : items) {
-            totalWeight += i.getChance();
+            totalWeight += i.getChance(damageUtil, player);
         }
 
         // Now choose a random item.
         int idx = 0;
         for (double r = Math.random() * totalWeight; idx < rollItems.length - 1; ++idx) {
-            r -= rollItems[idx].getChance();
+            r -= rollItems[idx].getChance(damageUtil, player);
             if (r <= 0.0) break;
         }
         amountDropped++;
@@ -134,10 +135,10 @@ public class RewardContainer {
         List<RewardLine> drops = new ArrayList<>();
         List<RewardLine> rewards = RewardLine.StringListToRewardList(rewardContainer.getStringList("Rewards"));
 
-        DropConditions.runConditions(rewards, player, damageUtil);
+        DropConditions.filter(rewards, player, damageUtil);
 
         for (RewardLine item : rewards) {
-            item.setChance(1d);
+            item.setChance("1");
             setParentTable(item, rewardContainer);
             drops.add(item);
         }
@@ -151,7 +152,7 @@ public class RewardContainer {
         DropConditions.runConditionsSimple(rewards);
 
         for (RewardLine item : rewards) {
-            item.setChance(1d);
+            item.setChance("1");
             setParentTable(item, rewardContainer);
             drops.add(item);
         }
@@ -161,6 +162,12 @@ public class RewardContainer {
     // This adds the LootTable options to the lineConfig.
     // Note: This won't override existing options
     public static RewardLine setParentTable(RewardLine lineConfig, ConfigurationSection rewardContainer) {
+
+        if(rewardContainer==null) {
+            Errors.UnableToFindLootTable(lineConfig.getOption(null, "parent"));
+            return lineConfig;
+        }
+
         for (String key : rewardContainer.getKeys(false)) {
             String value = rewardContainer.getString(key);
             lineConfig.put(key, value);

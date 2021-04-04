@@ -1,4 +1,5 @@
-WhiteBag:
+ExampleBag:
   Material: CHEST
+  Display: '&aOre Bag'
   Rewards:
-    - diamond_block
+    - loottable:ExampleTable

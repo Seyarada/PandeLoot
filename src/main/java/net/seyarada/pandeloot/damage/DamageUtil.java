@@ -6,6 +6,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class DamageUtil {
@@ -23,6 +24,14 @@ public class DamageUtil {
 
         this.uuid = uuid;
         playerDamage = DamageTracker.get(uuid);
+        if(playerDamage==null) {
+            location=null;
+            totalHP=0;
+            rankedPlayers=null;
+            player=null;
+            damage=null;
+            return;
+        }
         totalHP = playerDamage.values().stream().mapToDouble(Double::valueOf).sum();
 
         // Gives a sorted list of players with more damage -> players with less damage
@@ -67,7 +76,10 @@ public class DamageUtil {
     }
 
     public double getDamage(int index) {
-        return Math.round(damage[index] * 100.0) / 100.0;
+        double dmg = ( damage[index] / getTotalHP() ) * 100.0;
+        DecimalFormat df = new DecimalFormat("#.##");
+
+        return Double.parseDouble(df.format(dmg));
     }
 
     public int getPlayerRank(Player p) {

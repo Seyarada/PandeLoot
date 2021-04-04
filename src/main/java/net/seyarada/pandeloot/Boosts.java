@@ -7,8 +7,8 @@ public class Boosts {
 
     private static int globalPower;
     private static long globalDuration;
-    private static Map<String, Integer> playerPower = new HashMap<>();
-    private static Map<String, Long> playerDuration = new HashMap<>();
+    public static Map<String, Integer> playerPower = new HashMap<>();
+    public static Map<String, Long> playerDuration = new HashMap<>();
 
     public static void setGlobalBoost(int power, long duration) {
 
@@ -30,10 +30,24 @@ public class Boosts {
         return 1;
     }
 
+    public static long getGlobalDuration() {
+        return  globalDuration-System.currentTimeMillis();
+    }
+
     public static int getPlayerBoost(String player) {
         if(playerPower.containsKey(player) && System.currentTimeMillis()<playerDuration.get(player))
             return playerPower.get(player);
         return 1;
+    }
+
+    public static void terminateGlobal() {
+        globalPower = 1;
+        globalDuration = 0;
+    }
+
+    public static void terminatePlayer(String i) {
+        playerPower.remove(i);
+        playerDuration.remove(i);
     }
 
 }

@@ -4,7 +4,10 @@ import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.compatibility.MMOItemsCompatibility;
 import net.seyarada.pandeloot.compatibility.OraxenCompatibility;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
+import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -18,7 +21,7 @@ public class RewardLine {
     private String item;
     private String line;
     private int amount = 1;
-    private double chance = 2;
+    private String chance = "1";
 
     private int start;
     private int end;
@@ -86,23 +89,12 @@ public class RewardLine {
         if(item.contains(";"))
             item = item.split(";")[0];
 
-        if(splitLine.length>1) {
+        if(splitLine.length>1) { // More than one element found when splitting by " "
 
-            double tempAmount;
-
-            tempAmount = Double.parseDouble(splitLine[1]);
+            amount = Integer.parseInt(splitLine[1]);
             if(splitLine.length>2)
-                chance = Double.parseDouble(splitLine[2]);
+                chance = splitLine[2];
 
-            System.out.println("TEMP:" + tempAmount);
-            System.out.println("TEMP:" + (tempAmount<1d));
-
-            if(tempAmount<1d) {
-                chance = tempAmount;
-                amount = 1;
-            } else {
-                amount = (int) tempAmount;
-            }
         }
 
     }
@@ -129,13 +121,16 @@ public class RewardLine {
         return item;
     }
 
-    public double getChance() { return chance; }
-
-    public boolean isShared() {
-        return false;
+    public double getChance(DamageUtil u, Player p) {
+        chance = PlaceholderUtil.parse(chance, u, p);
+        return PlaceholderUtil.parseMath(chance);
     }
 
-    public void setChance(double chance) {
+    public boolean isShared() {
+        return Boolean.parseBoolean(getOption("false", "shared"));
+    }
+
+    public void setChance(String chance) {
         this.chance = chance;
     }
 
@@ -172,6 +167,18 @@ public class RewardLine {
 
     public boolean getSkip() {
         return skip;
+    }
+
+    public int getSkipAmount() { return Integer.parseInt(getOption("0", "skip")); }
+
+    public boolean shouldStop() { return Boolean.parseBoolean(getOption("false", "stop")); }
+
+    public int getDelay() {
+        return Integer.parseInt(getOption("0", "delay"));
+    }
+
+    public double getExplodeRadius() {
+        return Double.parseDouble(getOption("3", "exploderadius"));
     }
 
     public static List<RewardLine> StringListToRewardList(List<String> strings) {

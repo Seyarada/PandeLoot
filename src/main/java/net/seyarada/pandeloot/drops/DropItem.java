@@ -5,35 +5,26 @@ import net.seyarada.pandeloot.Errors;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.items.LootTable;
 import net.seyarada.pandeloot.nms.NMSManager;
+import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import net.seyarada.pandeloot.rewards.RewardOptions;
-import net.seyarada.pandeloot.schedulers.Beam;
-import net.seyarada.pandeloot.schedulers.HideItem;
-import net.seyarada.pandeloot.schedulers.ParticleTrail;
-import net.seyarada.pandeloot.utils.ColorUtil;
-import net.seyarada.pandeloot.utils.DropUtil;
-import org.bukkit.Bukkit;
+import net.seyarada.pandeloot.schedulers.HideEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class DropItem extends RewardOptions {
 
-    private RewardLine reward;
-    private Location location;
-    private Player player;
-    private Item item;
+    public RewardLine reward;
+    public Location location;
+    public Player player;
+    public Item item;
 
-    private DamageUtil damageUtil;
-
-    public static Map<UUID, DropItem> save = new HashMap<>();
+    public DamageUtil damageUtil;
 
     public DropItem(RewardLine reward, Location location, Player player) {
         super(reward);
@@ -52,8 +43,6 @@ public class DropItem extends RewardOptions {
 
     private void initDropItem() {
 
-        System.out.println(5);
-
         if(getParent()!=null) {
             reward = LootTable.setParentTable(reward, Config.getLootTableRaw(parent));
         }
@@ -63,7 +52,7 @@ public class DropItem extends RewardOptions {
         parseConditions();
 
         doDrop();
-        doEffects();
+        new DropEffects(this);
     }
 
     public void doDrop() {
@@ -118,79 +107,14 @@ public class DropItem extends RewardOptions {
         //}, 0, 1);
 
         if(player!=null) {
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), "mythicloot", player.getName()));
-            new HideItem(item, player);
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.root, player.getName()));
+            new HideEntity(item, player);
         }
         if(!stackable)
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), "mythicloot.preventstack", UUID.randomUUID().toString()));
-        if(preventpickup)
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), "mythicloot.preventpickup", "true"));
-    }
-
-    public void doEffects() {
-
-        // Effects that require the dropped item
-        if(item!=null) {
-            if (explode) {
-                Vector velocity = DropUtil.getVelocity(expoffset, expheight);
-                item.setVelocity(velocity);
-            }
-
-            if (glow) {
-                if (color.equalsIgnoreCase("random")) {
-                    color = ColorUtil.randomColor();
-                }
-                ColorUtil.ColorHandler(item, color);
-
-                if (player != null) {
-                    new ParticleTrail(item, color, player);
-                } else
-                    new ParticleTrail(item, color, location);
-            }
-
-            if (beam > 0) {
-                if (player != null) {
-                    new Beam(item, color, player, beam);
-                } else
-                    new Beam(item, color, location, beam);
-            }
-
-            if (playonpickup) {
-                UUID uuid = UUID.randomUUID();
-                item.setItemStack(NMSManager.addNBT(item.getItemStack(), "mythicloot.playonpickup", uuid.toString()));
-                save.put(uuid, this);
-                playonpickup = false;
-                return;
-            }
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.preventStack, UUID.randomUUID().toString()));
+        if(preventpickup) {
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.preventPickup, "true"));
         }
-
-        // Effects that do not require the dropped item
-        DropUtil.sendDiscordEmbed(player, damageUtil, dTitle, dMessage, dChannel, dColor, dLink, dAvatar);
-
-        if(player!=null) {
-
-            if (message != null)
-                player.sendMessage(message);
-
-            if (!title.isEmpty() || !subtitle.isEmpty())
-                player.sendTitle(title, subtitle, titleFade, titleDuration, titleFade);
-
-            if (sound != null)
-                player.playSound(player.getLocation(), sound, 1, 1);
-
-            if (broadcast != null)
-                Bukkit.broadcastMessage(broadcast);
-
-            if (command != null)
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-
-            if (experience > 0)
-                player.giveExp(experience);
-        }
-
-        // TODO
-        // eco
-        // if(actionbar!=null)
     }
-
+    
 }

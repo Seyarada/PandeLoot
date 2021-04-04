@@ -1,21 +1,23 @@
 package net.seyarada.pandeloot.drops;
 
+import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.items.ItemUtils;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class DropManager {
 
-    private final List<Player> players;
+    private List<Player> players;
     private List<RewardLine> rewards;
     private DamageUtil damageUtil;
     private Location location;
+
+    public int delay;
 
     public DropManager(List<Player> players, List<RewardLine> rewards) {
         this.players = players;
@@ -33,64 +35,69 @@ public class DropManager {
         this.rewards = rewards;
     }
 
+    public DropManager(Location location, List<RewardLine> rewards) {
+        this.location = location;
+        this.rewards = rewards;
+    }
+
     public void setDamageUtil(DamageUtil util) {
         this.damageUtil = util;
     }
 
+    public DamageUtil getDamageUtil() { return damageUtil; }
+
     public void initDrops() {
-        System.out.println("+");
         List<RewardLine> playerDrops = new ArrayList<>();
         for(Player i : players) {
-            System.out.println("++");
             playerDrops.clear();
             ItemUtils.collectRewards(rewards, playerDrops, players.size(), damageUtil, i);
             DropConditions.filter(playerDrops, i, damageUtil);
 
-            /*
-            double n = playerDrops.size();
-
-            for (double x = 1; x < n+1; x++) {
-                double angle = 2 * Math.PI / n;
-                double cos = Math.cos(angle * x);
-                double sin = Math.sin(angle * x);
-                double iX = damageUtil.getLocation().getX() + 3 * cos;
-                double iZ = damageUtil.getLocation().getZ() + 3 * sin;
-
-                Location loc = damageUtil.getLocation().clone();
-                loc.setX(iX);
-                loc.setZ(iZ);
-
-                Bukkit.getScheduler().scheduleSyncRepeatingTask(PandeLoot.getInstance(), () -> {
-
-                    Color rgb = ColorUtil.getRGB("GOLD");
-                    Particle.DustOptions dustOptions = new Particle.DustOptions(rgb, 1);
-                    damageUtil.getLocation().getWorld().spawnParticle(Particle.REDSTONE, loc, 1, dustOptions);
-
-                }, 0, 1);
-            }
-            */
-
-            System.out.println("+++");
+            int playerDelay = 0;
+            int skip = 0;
+            Map<Double, Integer> advCounter = new HashMap<>();
 
             for(RewardLine j : playerDrops) {
+                if(skip>0) {
+                    skip--;
+                    continue;
+                }
 
-                System.out.println("++++");
+                if(advCounter.containsKey(j.getExplodeRadius())) {
+                    advCounter.put(j.getExplodeRadius(), advCounter.get(j.getExplodeRadius())+1);
+                } else {
+                    advCounter.put(j.getExplodeRadius(), 1);
+                }
 
-                System.out.println(4 + j.getLine());
+                j.options.put("RadialDrop", advCounter);
+                j.options.put("ThisItem", advCounter.get(j.getExplodeRadius())+1);
 
-                System.out.println("Chance:"+ j.getChance());
-
-                if(damageUtil!=null)
-                    new DropItem(j, damageUtil.getLocation(), i);
-                else
-                    new DropItem(j, location, i);
-
+                playerDelay += j.getDelay();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        dropAction(j,i);
+                    }
+                }.runTaskLater(PandeLoot.getInstance(), playerDelay);
 
                 if(j.isShared())
                     rewards.remove(j);
+                if(j.shouldStop())
+                    break;
+
+                skip = j.getSkipAmount();
             }
 
+            delay = playerDelay;
+
         }
+    }
+
+    private void dropAction(RewardLine j, Player i) {
+        if(damageUtil!=null)
+            new DropItem(j, damageUtil.getLocation(), i);
+        else
+            new DropItem(j, location, i);
     }
 
 }

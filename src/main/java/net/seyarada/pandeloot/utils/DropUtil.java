@@ -8,12 +8,8 @@ import net.seyarada.pandeloot.damage.DamageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 import java.util.Random;
-import java.util.UUID;
 
 public class DropUtil {
 
@@ -27,15 +23,7 @@ public class DropUtil {
 
     public static double parseMath(String string, Player player, DamageUtil damageUtil) {
         string = parsePlaceholders(string, player, damageUtil);
-
-        NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
-        ScriptEngine engine = factory.getScriptEngine();
-        try {
-            return Double.parseDouble(String.valueOf(engine.eval(string)));
-        } catch (ScriptException e) {
-            e.printStackTrace();
-        }
-        return 1;
+        return MathUtil.eval(string);
     }
 
     public static String parsePlaceholders(String string, Player player, DamageUtil damageUtil) {

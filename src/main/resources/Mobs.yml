@@ -1,0 +1,7 @@
+ExampleMob:
+  Type: Wither_Skeleton
+  World: World
+  Rewards:
+  - coal
+  Options:
+    ScoreHologram: false

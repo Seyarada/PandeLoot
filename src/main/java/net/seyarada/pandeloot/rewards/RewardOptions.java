@@ -1,5 +1,7 @@
 package net.seyarada.pandeloot.rewards;
 
+import net.seyarada.pandeloot.Config;
+
 public class RewardOptions {
 
     public String message;
@@ -10,21 +12,22 @@ public class RewardOptions {
     public String broadcast;
     public String actionbar;
     public String parent;
+    public String explodeType;
+    public String hologram;
     public boolean glow;
     public boolean explode;
     public boolean stackable;
     public boolean preventpickup;
     public boolean playonpickup;
-    public boolean dropcontents;
     public int titleDuration;
     public int titleFade;
     public int delay;
     public double expheight;
     public double expoffset;
     public double beam;
+    public double explodeRadius;
 
     public String damage;
-    public int top;
     public boolean stop;
     public boolean shared;
     public int skip;
@@ -54,59 +57,58 @@ public class RewardOptions {
     }
 
     public void parseEffects() {
-        this.message = reward.getOption(null, "message","msg");
-        this.message = reward.getOption(null, "message","msg");
-        this.color = reward.getOption("display", "color");
-        this.title = reward.getOption("", "title");
-        this.subtitle = reward.getOption("", "subtitle");
-        this.sound = reward.getOption(null, "sound");
-        this.broadcast = reward.getOption(null, "broadcast");
-        this.actionbar = reward.getOption(null, "actionbar");
-        this.parent = reward.getOption(null, "parent");
+        this.message = reward.getOption(Config.getDefault("Message"), "message","msg");
+        this.color = reward.getOption(Config.getDefault("Color"), "color");
+        this.title = reward.getOption(Config.getDefault("Title"), "title");
+        this.subtitle = reward.getOption(Config.getDefault("Subtitle"), "subtitle");
+        this.sound = reward.getOption(Config.getDefault("Sound"), "sound");
+        this.broadcast = reward.getOption(Config.getDefault("Broadcast"), "broadcast");
+        this.actionbar = reward.getOption(Config.getDefault("Actionbar"), "actionbar");
+        this.parent = reward.getOption(Config.getDefault("Parent"), "parent");
+        this.explodeType = reward.getOption(Config.getDefault("ExplodeType"), "explodeType");
+        this.hologram = reward.getOption(Config.getDefault("Hologram"), "hologram");
 
-        this.stackable = Boolean.parseBoolean(reward.getOption("true", "stackable","stacks"));
-        this.glow = Boolean.parseBoolean(reward.getOption("true", "glow"));
-        this.explode = Boolean.parseBoolean(reward.getOption("true", "explode"));
-        this.preventpickup = Boolean.parseBoolean(reward.getOption("false", "preventpickup","pickup"));
-        this.playonpickup = Boolean.parseBoolean(reward.getOption("false", "playonpickup","onpickup"));
-        this.dropcontents = Boolean.parseBoolean(reward.getOption("false", "dropcontents"));
+        this.stackable = Boolean.parseBoolean(reward.getOption(Config.getDefault("Stackable"), "stackable","stacks"));
+        this.glow = Boolean.parseBoolean(reward.getOption(Config.getDefault("Glow"), "glow"));
+        this.explode = Boolean.parseBoolean(reward.getOption(Config.getDefault("Explode"), "explode"));
+        this.preventpickup = Boolean.parseBoolean(reward.getOption(Config.getDefault("PreventPickup"), "preventpickup","pickup"));
+        this.playonpickup = Boolean.parseBoolean(reward.getOption(Config.getDefault("PlayOnPickup"), "playonpickup","onpickup"));
 
-        this.titleDuration = Integer.parseInt(reward.getOption("20", "titleduration","td"));
-        this.titleFade = Integer.parseInt(reward.getOption("20", "titlefade","tf"));
-        this.delay = Integer.parseInt(reward.getOption("0", "delay"));
+        this.titleDuration = Integer.parseInt(reward.getOption(Config.getDefault("TitleDuration"), "titleduration","td"));
+        this.titleFade = Integer.parseInt(reward.getOption(Config.getDefault("TitleFade"), "titlefade","tf"));
+        this.delay = Integer.parseInt(reward.getOption(Config.getDefault("Delay"), "delay"));
 
-        this.expheight = Double.parseDouble(reward.getOption("0.6", "expheight"));
-        this.expoffset = Double.parseDouble(reward.getOption("0.2", "expoffset"));
-        this.beam = Double.parseDouble(reward.getOption("0", "beam"));
+        this.expheight = Double.parseDouble(reward.getOption(Config.getDefault("ExpHeight"), "expheight"));
+        this.expoffset = Double.parseDouble(reward.getOption(Config.getDefault("ExpOffset"), "expoffset"));
+        this.beam = Double.parseDouble(reward.getOption(Config.getDefault("Beam"), "beam"));
+        this.explodeRadius = Double.parseDouble(reward.getOption(Config.getDefault("ExplodeRadius"), "explodeRadius"));
 
         // DiscordSRV things
-        this.dTitle = reward.getOption(null, "dtitle");
-        this.dMessage = reward.getOption(null, "dmessage");
-        this.dChannel = reward.getOption(null, "dchannel");
+        this.dTitle = reward.getOption(Config.getDefault("DTitle"), "dtitle");
+        this.dMessage = reward.getOption(Config.getDefault("DMessage"), "dmessage");
+        this.dChannel = reward.getOption(Config.getDefault("DChannel"), "dchannel");
         this.dColor = reward.getOption("GREEN", "dcolor");
-        this.dLink = reward.getOption(null, "dlink");
-        this.dAvatar = Boolean.parseBoolean(reward.getOption("true", "davatar"));
+        this.dLink = reward.getOption(Config.getDefault("DLink"), "dlink");
+        this.dAvatar = Boolean.parseBoolean(reward.getOption(Config.getDefault("DAvatar"), "davatar"));
 
         // These aren't "effects" but I don't have a better
         // place where to place them at the moment
-        this.command = reward.getOption(null, "command");
-        this.experience = Integer.parseInt(reward.getOption("0", "experience", "xp"));
-        this.skip = Integer.parseInt(reward.getOption("0", "skip"));
-        this.money = Double.parseDouble(reward.getOption("0", "money"));
-        this.stop = Boolean.parseBoolean(reward.getOption("false", "stop"));
+        this.command = reward.getOption(Config.getDefault("Command"), "command");
+        this.experience = Integer.parseInt(reward.getOption(Config.getDefault("Experience"), "experience", "xp"));
+        this.skip = Integer.parseInt(reward.getOption(Config.getDefault("Skip"), "skip"));
+        this.money = Double.parseDouble(reward.getOption(Config.getDefault("Money"), "money"));
+        this.stop = Boolean.parseBoolean(reward.getOption(Config.getDefault("Stop"), "stop"));
 
     }
 
     public void parseConditions() {
-        this.damage = reward.getOption(null, "damage");
-        this.top = Integer.parseInt(reward.getOption("0", "top"));
-        this.shared = Boolean.parseBoolean(reward.getOption("false", "shared"));
+        this.shared = Boolean.parseBoolean(reward.getOption(Config.getDefault("Shared"), "shared"));
         this.multiplier = Double.parseDouble(reward.getOption("0", "multiplier"));
     }
 
     public void parseItemData() {
         this.amount = Integer.parseInt(reward.getOption("1", "amount"));
-        this.toInv = Boolean.parseBoolean(reward.getOption("false", "toInv"));
+        this.toInv = Boolean.parseBoolean(reward.getOption(Config.getDefault("ToInventory"), "toInventory"));
     }
 
     public String getParent() {

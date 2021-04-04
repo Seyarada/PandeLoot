@@ -1,43 +1,11 @@
-Potato:
-  Color: RED
-  TotalItems: 1
+ExampleTable:
+  Delay: 5
+  TotalItems: 3
   Rewards:
-    - diamond_block{top=2}
-    - emerald_block
-    - iron_block{top=1}
-
-Pinata:
-  Color: GREEN
-  TotalItems: 1
-  Rewards:
-    - emerald
-    - emerald_block
-    - diamond
     - diamond_block
-    - gold_ingot
-    - gold_block
-    - iron_ingot
     - iron_block
-    - coal
-    - coal_block
-    - redstone
+    - emerald_block
+    - gold_block
     - redstone_block
-
-Tools:
-  Color: BLUE
-  Message: Hello
-  Rewards:
-    - diamond_sword
-    - diamond_pickaxe
-    - diamond_axe
-    - diamond_shovel
-    - loottable:My3rdTable
-
-My3rdTable:
-  Rewards:
-    - ender_chest
-
-
-ServerBoostIsCool:
-  Rewards:
-    - diamond{message=Current boost is %boost%} 5*%boost% 0.3*%boost%
+    - coal_block
+    - lapis_block

@@ -2,29 +2,30 @@ package net.seyarada.pandeloot.schedulers;
 
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.nms.NMSManager;
+import net.seyarada.pandeloot.nms.V1_16_R3;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public class HideItem {
+public class HideEntity {
 
     private int id;
+    //private int abandonTime;
 
     // This leaves a trail of particles of a specific color behind the item
 
-    public HideItem(Item item, Player player) {
+    public HideEntity(Entity toHide, Player player) {
 
         Plugin plugin = PandeLoot.getInstance();
 
         id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            if (toHide.isValid()) {
 
-            if (item.isValid()) {
-
-                for (Entity entity : item.getNearbyEntities(36, 36, 36)) {
+                for (Entity entity : toHide.getNearbyEntities(36, 36, 36)) {
                     if (entity instanceof Player && !entity.getName().equals(player.getName())) {
-                        NMSManager.destroyEntity(item, entity);
+                        NMSManager.destroyEntity(toHide.getEntityId(), entity);
                     }
                 }
 

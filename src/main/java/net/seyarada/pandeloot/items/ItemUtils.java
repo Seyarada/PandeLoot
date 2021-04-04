@@ -10,7 +10,6 @@ public class ItemUtils {
 
     public static void collectRewards(List<RewardLine> rewardsToCollect, List<RewardLine> store, int playerSize, DamageUtil damageUtil, Player player) {
         for(RewardLine i : rewardsToCollect) {
-            System.out.println(i.getOrigin());
             switch(i.getOrigin()) {
                 case "loottable":
                     LootTable lootTable = LootTable.of(i);
@@ -21,12 +20,11 @@ public class ItemUtils {
                     break;
                 default:
                     if(i.isShared()) {
-                        i.setChance(1d/playerSize);
+                        i.setChance(String.valueOf(1d/playerSize));
                     }
                     store.add(i);
             }
         }
-        System.out.println("Store "+store.size());
     }
 
 }

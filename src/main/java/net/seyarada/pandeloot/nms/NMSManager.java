@@ -8,24 +8,25 @@ import org.bukkit.inventory.ItemStack;
 
 public class NMSManager {
 
-    public static void removeNBT(ItemStack item, String entity) {
+    public static ItemStack removeNBT(ItemStack item, String entity) {
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
             case "v1_16_R3":
-                V1_16_R3.removeNBT(item, entity); break;
+                return V1_16_R3.removeNBT(item, entity);
             case "v1_16_R2":
-                V1_16_R2.removeNBT(item, entity); break;
+                return V1_16_R2.removeNBT(item, entity);
             case "v1_16_R1":
-                V1_16_R1.removeNBT(item, entity); break;
+                return V1_16_R1.removeNBT(item, entity);
             case "v1_15_R1":
-                V1_15_R1.removeNBT(item, entity); break;
+                return V1_15_R1.removeNBT(item, entity);
             case "v1_14_R1":
-                V1_14_R1.removeNBT(item, entity); break;
+                return V1_14_R1.removeNBT(item, entity);
             case "v1_13_R2":
-                V1_13_R2.removeNBT(item, entity); break;
+                return V1_13_R2.removeNBT(item, entity);
             case "v1_13_R1":
-                V1_13_R1.removeNBT(item, entity); break;
+                return V1_13_R1.removeNBT(item, entity);
         }
+        return item;
     }
 
     public static ItemStack addNBT(ItemStack item, String key, String value) {
@@ -91,23 +92,23 @@ public class NMSManager {
         return null;
     }
 
-    public static void destroyEntity(Item item, Entity entity) {
+    public static void destroyEntity(int toDestroy, Entity entity) {
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
             case "v1_16_R3":
-                V1_16_R3.destroyEntity(item, entity); break;
+                V1_16_R3.destroyEntity(toDestroy, entity); break;
             case "v1_16_R2":
-                V1_16_R2.destroyEntity(item, entity); break;
+                V1_16_R2.destroyEntity(toDestroy, entity); break;
             case "v1_16_R1":
-                V1_16_R1.destroyEntity(item, entity); break;
+                V1_16_R1.destroyEntity(toDestroy, entity); break;
             case "v1_15_R1":
-                V1_15_R1.destroyEntity(item, entity); break;
+                V1_15_R1.destroyEntity(toDestroy, entity); break;
             case "v1_14_R1":
-                V1_14_R1.destroyEntity(item, entity); break;
+                V1_14_R1.destroyEntity(toDestroy, entity); break;
             case "v1_13_R2":
-                V1_13_R2.destroyEntity(item, entity); break;
+                V1_13_R2.destroyEntity(toDestroy, entity); break;
             case "v1_13_R1":
-                V1_13_R1.destroyEntity(item, entity); break;
+                V1_13_R1.destroyEntity(toDestroy, entity); break;
         }
     }
 

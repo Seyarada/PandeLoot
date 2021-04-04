@@ -5,6 +5,7 @@ import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
@@ -52,8 +53,8 @@ public class V1_15_R1 {
         return null;
     }
 
-    public static void destroyEntity(Item item, Entity entity) {
-        PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(item.getEntityId());
+    public static void destroyEntity(int toBeDestroyed, Entity entity) {
+        PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(toBeDestroyed);
         ((CraftPlayer) entity).getHandle().playerConnection.sendPacket(packet);
     }
 
@@ -68,13 +69,14 @@ public class V1_15_R1 {
             double lY = location.getY() + 1.2;
             double lZ = location.getZ();
 
-            List<String> messages = Config.config.getStringList("ScoreBoardAnnouncement");
+            List<String> messages = Config.getScoreHologram();
             Collections.reverse(messages);
 
             for (String msg : messages) {
                 lY += 0.2;
-
                 if(msg==null || msg.isEmpty()) continue;
+
+                msg = PlaceholderUtil.parse(msg, damageUtil, player);
 
                 final EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.ARMOR_STAND, wS);
                 armorStand.setPosition(lX, lY, lZ);

@@ -1,2 +1,59 @@
-ThisIsATest:
-  Color: Wow
+Settings:
+  RainbowFrequency: 3
+
+Announcements:
+  ScoreHologram:
+    - '&8&m========================'
+    - '%mob.name% &7- &a%mob.hp%HP'
+    - '&e#1 &7|&b &f%1.name% &7|&b %1.dmg%%'
+    - '&6#2 &7|&b &f%2.name% &7|&b %2.dmg%%'
+    - '&3#3 &7|&b &f%3.name% &7|&b %3.dmg%%'
+    - ''
+    - 'Your rank: &a#%player.rank% | %player.dmg%'
+    - '&8&m========================'
+  ScoreMessage:
+    - '&8&m========================================'
+    - '%mob.name% &7- &a%mob.hp%HP'
+    - '&e#1 &7|&b &f%1.name% &7|&b %1.dmg%%'
+    - '&6#2 &7|&b &f%2.name% &7|&b %2.dmg%%'
+    - '&3#3 &7|&b &f%3.name% &7|&b %3.dmg%%'
+    - ''
+    - 'Your rank: &a#%player.rank%'
+    - '&8&m========================================'
+
+DefaultValues:
+  Message: null
+  Color: Display
+  Title: null
+  Subtitle: null
+  Sound: null
+  Broadcast: null
+  Actionbar: null
+  Parent: null
+  ExplodeType: Spread
+  Hologram: Display
+  Stackable: true
+  Glow: true
+  Explode: true
+  PreventPickup: false
+  PlayOnPickup: false
+  TitleDuration: 20
+  TitleFade: 20
+  Delay: 0
+  ExpHeight: 0.6
+  ExpOffset: 0.2
+  Beam: 0.0
+  ExplodeRadius: 3.0
+  DTitle: null
+  DMessage: null
+  DChannel: null
+  DColor: GREEN
+  DLink: null
+  DAvatar: true
+  Command: null
+  Experience: 0
+  Skip: 0
+  Money: 0
+  Stop: false
+  Shared: false
+  ToInventory: false

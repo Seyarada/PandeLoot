@@ -10,7 +10,6 @@ public class PandeLoot extends JavaPlugin {
 
     private static PandeLoot instance;
 
-    MythicMobsCompatibility mmComp = new MythicMobsCompatibility();
 
     @Override
     public void onEnable() {
@@ -18,7 +17,10 @@ public class PandeLoot extends JavaPlugin {
         instance = this;
 
         new Config();
-        this.getServer().getPluginManager().registerEvents(mmComp, this);
+        if(getServer().getPluginManager().getPlugin("MythicMobs")!=null) {
+            MythicMobsCompatibility mmComp = new MythicMobsCompatibility();
+            this.getServer().getPluginManager().registerEvents(mmComp, this);
+        }
         this.getServer().getPluginManager().registerEvents(new DamageTracker(), this);
         this.getServer().getPluginManager().registerEvents(new RewardsListener(), this);
 
@@ -31,6 +33,7 @@ public class PandeLoot extends JavaPlugin {
         new ReloadCommand();
 
         this.getCommand("pandeloot").setTabCompleter(new AutoComplete());
+
     }
 
     @Override

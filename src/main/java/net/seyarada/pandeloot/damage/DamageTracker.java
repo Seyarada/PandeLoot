@@ -1,6 +1,7 @@
 package net.seyarada.pandeloot.damage;
 
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -8,6 +9,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
 
@@ -18,12 +22,9 @@ public class DamageTracker implements Listener {
     // damageMap.containsKey(playerName)
 
     // Stores the mobs registered as mobs that should have the damage tracked
-    public static List<UUID> loadedMobs = new ArrayList<>();
+    public static Map<UUID, MobOptions> loadedMobs = new HashMap<>();
 
     public static void addPlayerDamage(UUID mob, Player player, Double damage) {
-        // Discard the event if the mob isn't being tracked
-        //if(!loadedMobs.contains(mob))
-        //    return;
 
         if( ((LivingEntity) Bukkit.getEntity(mob) ).getHealth() < damage )
             damage = ((LivingEntity)Bukkit.getEntity(mob) ).getHealth();
@@ -60,6 +61,7 @@ public class DamageTracker implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDamaged(EntityDamageByEntityEvent e) {
         UUID uuid = e.getEntity().getUniqueId();
+        if(!loadedMobs.containsKey(uuid)) return;
 
         if(e.getDamager() instanceof Player) {
             addPlayerDamage(uuid, (Player) e.getDamager(), e.getFinalDamage());
@@ -70,10 +72,55 @@ public class DamageTracker implements Listener {
             if (((Projectile) e.getDamager()).getShooter() instanceof Player) {
                 Player player = (Player) (((Projectile) e.getDamager()).getShooter());
                 addPlayerDamage(uuid, player, e.getFinalDamage());
-                return;
             }
         }
 
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        Player name = e.getEntity();
+        remove(name);
+    }
+
+    @EventHandler
+    public void onWorldChange(PlayerChangedWorldEvent e) {
+        Player name = e.getPlayer();
+        remove(name);
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        Player name = e.getPlayer();
+        remove(name);
+    }
+
+    public void remove(Player player) {
+
+        for(UUID uuid : damageTracker.keySet())  {
+            Map<Player, Double> map = damageTracker.get(uuid);
+            MobOptions mobOptions;
+
+            if(loadedMobs.containsKey(uuid))
+                mobOptions = loadedMobs.get(uuid);
+            else continue;
+
+            if(map.containsKey(player)) {
+
+                if(mobOptions.resetPlayers) {
+                    Double playerDamage = map.get(player);
+                    map.remove(player);
+                    if(mobOptions.resetHeal) {
+                        LivingEntity a = ((LivingEntity) Bukkit.getEntity(uuid));
+                        if(a!=null) {
+                            double health = a.getHealth()+playerDamage;
+                            double maxHP = a.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+                            a.setHealth(Math.min(health, maxHP));
+                        }
+                    }
+                }
+            }
+        }
     }
 
 

@@ -20,32 +20,33 @@ public class AutoComplete implements TabCompleter {
                 List<String> autoCompletes = new ArrayList<>();
                 for(String i : autoComplete.get(args.length)) {
 
-                    int k = 0;
-                    int success = args.length;
+                    int match = 0;
+                    int tick = 0;
+                    String[] iVal = i.split("\\.");
 
+                    for (String o : args) {
+                        if (iVal.length <= tick) continue;
+                        if (iVal[tick].equals("null")) continue;
+                        if (o.isEmpty()) match++;
 
-                    for(String j : i.split("\\.")) {
-
-                        if(j.equals(args[k])||j.equals("null")) {
-                            success--;
+                        if (o.equals(iVal[tick])) {
+                            match++;
+                        } else {
+                            match--;
                         }
-                        else if(j.equals("players")) {
+                        tick++;
+                    }
+                    if (match + 1 >= tick) {
+                        String toAdd = iVal[iVal.length - 1];
+
+                        if(toAdd.equals("players")) {
                             for(Player n : Bukkit.getOnlinePlayers()) {
-                                autoCompletes.add(n.getName());
+                                    autoCompletes.add(n.getName());
                             }
                         }
-                        k++;
-
+                        else
+                            autoCompletes.add(iVal[iVal.length - 1]);
                     }
-
-                    if(success==1) {
-                        String entry = args[args.length - 1];
-                        String suggest = i.split("\\.")[i.split("\\.").length - 1];
-                        if(!suggest.equals("null") && suggest.startsWith(entry) && !suggest.equals("players")) {
-                            autoCompletes.add(suggest);
-                        }
-                    }
-
                 }
 
                 return autoCompletes;
