@@ -21,6 +21,12 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
 
+        <!-- Bukkit -->
+        <repository>
+            <id>bukkit-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/org/bukkit/bukkit/</url>
+        </repository>
+
         <!-- Oraxen -->
         <repository>
             <id>jitpack.io</id>
@@ -88,6 +94,70 @@
             <groupId>com.discordsrv</groupId>
             <artifactId>discordsrv</artifactId>
             <version>1.21.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- NMS -->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit-1.13</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.13.2</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.14</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.15</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.16.1</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.16.2</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.16.3</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.16.4</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.16.5</artifactId>
+            <version>dev</version>
             <scope>provided</scope>
         </dependency>
 

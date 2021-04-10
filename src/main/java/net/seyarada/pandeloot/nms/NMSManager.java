@@ -23,8 +23,6 @@ public class NMSManager {
                 return V1_14_R1.removeNBT(item, entity);
             case "v1_13_R2":
                 return V1_13_R2.removeNBT(item, entity);
-            case "v1_13_R1":
-                return V1_13_R1.removeNBT(item, entity);
         }
         return item;
     }
@@ -44,8 +42,6 @@ public class NMSManager {
                 return V1_14_R1.addNBT(item, key, value);
             case "v1_13_R2":
                 return V1_13_R2.addNBT(item, key, value);
-            case "v1_13_R1":
-                return V1_13_R1.addNBT(item, key, value);
         }
         return item;
     }
@@ -65,8 +61,6 @@ public class NMSManager {
                 return V1_14_R1.hasTag(item, tag);
             case "v1_13_R2":
                 return V1_13_R2.hasTag(item, tag);
-            case "v1_13_R1":
-                return V1_13_R1.hasTag(item, tag);
         }
         return false;
     }
@@ -86,8 +80,6 @@ public class NMSManager {
                 return V1_14_R1.getTag(item, tag);
             case "v1_13_R2":
                 return V1_13_R2.getTag(item, tag);
-            case "v1_13_R1":
-                return V1_13_R1.getTag(item, tag);
         }
         return null;
     }
@@ -107,8 +99,6 @@ public class NMSManager {
                 V1_14_R1.destroyEntity(toDestroy, entity); break;
             case "v1_13_R2":
                 V1_13_R2.destroyEntity(toDestroy, entity); break;
-            case "v1_13_R1":
-                V1_13_R1.destroyEntity(toDestroy, entity); break;
         }
     }
 
@@ -127,8 +117,6 @@ public class NMSManager {
                 V1_14_R1.spawnHologram(damageUtil); break;
             case "v1_13_R2":
                 V1_13_R2.spawnHologram(damageUtil); break;
-            case "v1_13_R1":
-                V1_13_R1.spawnHologram(damageUtil); break;
         }
     }
 
