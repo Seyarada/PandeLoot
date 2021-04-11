@@ -2,10 +2,8 @@ package net.seyarada.pandeloot.schedulers;
 
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.nms.NMSManager;
-import net.seyarada.pandeloot.nms.V1_16_R3;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 

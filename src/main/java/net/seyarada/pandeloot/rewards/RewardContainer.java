@@ -9,8 +9,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class RewardContainer {
 
@@ -30,6 +28,16 @@ public class RewardContainer {
     public RewardContainer(ConfigurationSection rewardContainer, RewardLine line) {
         this.rewardContainer = rewardContainer;
         this.line = line;
+
+        if(rewardContainer==null) {
+            if(line.getOrigin().equals("lootbag"))
+                Errors.UnableToFindLootBag(line.getItem());
+            else if(line.getOrigin().equals("loottable"))
+                Errors.UnableToFindLootTable(line.getItem());
+            return;
+        }
+
+        setLootTableOriginOptions();
         initDropTable();
     }
 
@@ -173,6 +181,15 @@ public class RewardContainer {
             lineConfig.put(key, value);
         }
         return lineConfig;
+    }
+
+    private void setLootTableOriginOptions() {
+        for (String key : line.options.keySet()) {
+            String value = String.valueOf(line.options.get(key));
+            if(!rewardContainer.contains(key)) {
+                rewardContainer.set(key, value);
+            }
+        }
     }
 
     public void setPlayer(Player player) {

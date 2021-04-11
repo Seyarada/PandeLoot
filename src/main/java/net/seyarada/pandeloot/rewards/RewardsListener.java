@@ -1,8 +1,5 @@
 package net.seyarada.pandeloot.rewards;
 
-import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
-import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobSpawnEvent;
-import io.lumine.xikage.mythicmobs.io.MythicConfig;
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
@@ -10,13 +7,13 @@ import net.seyarada.pandeloot.damage.MobOptions;
 import net.seyarada.pandeloot.drops.DropEffects;
 import net.seyarada.pandeloot.drops.DropItem;
 import net.seyarada.pandeloot.drops.DropManager;
+import net.seyarada.pandeloot.items.LootBag;
 import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.utils.ChatUtil;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -116,8 +113,11 @@ public class RewardsListener implements Listener {
         Entity mob = e.getEntity();
         UUID uuid = mob.getUniqueId();
 
+        // Don't drop if the mob isn't loaded or nobody has damaged it
         if(!DamageTracker.loadedMobs.containsKey(uuid)) return;
         DamageTracker.loadedMobs.remove(uuid);
+        if(!DamageTracker.damageTracker.containsKey(uuid)) return;
+        if(DamageTracker.get(uuid).size()==0) return;
 
         ConfigurationSection config = Config.getMob(mob);
         boolean rank = config.getBoolean("Options.ScoreMessage");

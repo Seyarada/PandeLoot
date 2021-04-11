@@ -13,7 +13,7 @@ public class ReloadCommand {
     public static boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         Config.reload();
-        sender.sendMessage("Reloaded!");
+        CommandText.sendTitle("Reloaded!", sender);
 
         return true;
     }

@@ -9,13 +9,11 @@ import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftArmorStand;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -60,6 +58,12 @@ public class V1_16_R3 {
         ((CraftPlayer) entity).getHandle().playerConnection.sendPacket(packet);
     }
 
+    public static void playArm(Player player) {
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+        EntityLiving living = ((CraftLivingEntity) player).getHandle();
+        PacketPlayOutAnimation swingArm = new PacketPlayOutAnimation(living, 0);
+        connection.sendPacket(swingArm);
+    }
 
     public static void spawnHologram(DamageUtil damageUtil) {
         UUID uuid = damageUtil.getUUID();

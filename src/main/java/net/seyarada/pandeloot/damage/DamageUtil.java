@@ -3,6 +3,7 @@ package net.seyarada.pandeloot.damage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -18,20 +19,15 @@ public class DamageUtil {
     private final Double[] damage;
     private final UUID uuid;
 
+    public final Entity entity;
+
     private final Location location;
 
     public DamageUtil(UUID uuid) {
 
         this.uuid = uuid;
+        this.entity = Bukkit.getEntity(uuid);
         playerDamage = DamageTracker.get(uuid);
-        if(playerDamage==null) {
-            location=null;
-            totalHP=0;
-            rankedPlayers=null;
-            player=null;
-            damage=null;
-            return;
-        }
         totalHP = playerDamage.values().stream().mapToDouble(Double::valueOf).sum();
 
         // Gives a sorted list of players with more damage -> players with less damage
@@ -51,7 +47,7 @@ public class DamageUtil {
         player = players.toArray(new Player[0]);
         damage = damages.toArray(new Double[0]);
 
-        location = Bukkit.getEntity(uuid).getLocation();
+        location = entity.getLocation();
 
     }
 
@@ -93,13 +89,13 @@ public class DamageUtil {
     }
 
     public double getEntityHealth() {
-        return ((LivingEntity) Bukkit.getEntity(uuid) ).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        return ((LivingEntity) entity ).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
     }
 
     public String getEntityName() {
-        if(Bukkit.getEntity(uuid).getCustomName()!=null)
-            return Bukkit.getEntity(uuid).getCustomName();
-        return Bukkit.getEntity(uuid).getName();
+        if(entity.getCustomName()!=null)
+            return entity.getCustomName();
+        return entity.getName();
     }
 
     public double getPercentageDamage(Player player) {

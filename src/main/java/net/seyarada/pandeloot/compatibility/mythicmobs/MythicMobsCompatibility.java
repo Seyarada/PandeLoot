@@ -32,6 +32,7 @@ public class MythicMobsCompatibility implements Listener {
         Optional<MythicItem> mI = MythicMobs.inst().getItemManager().getItem(item);
         if (mI.isPresent())
             return BukkitAdapter.adapt(mI.get().generateItemStack(1));
+
         return null;
     }
 

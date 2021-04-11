@@ -1,7 +1,6 @@
 package net.seyarada.pandeloot.commands;
 
 import net.seyarada.pandeloot.Boosts;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 

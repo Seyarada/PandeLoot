@@ -33,7 +33,7 @@ public class RainbowRunner {
 
             if(item.isValid()) {
 
-                ColorUtil.setItemColor(item, color);
+                ColorUtil.setItemColor(item, color, null);
 
                 if(item.isOnGround()) { // Beam
                     double modHeight = beam;
@@ -69,7 +69,7 @@ public class RainbowRunner {
 
             if(item.isValid()) {
 
-                ColorUtil.setItemColor(item, color);
+                ColorUtil.setItemColor(item, color, player);
 
                 if(item.isOnGround()) { // Beam
                     double modHeight = beam;

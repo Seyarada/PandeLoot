@@ -12,4 +12,8 @@ public class Errors {
         System.err.println("[PandeLoot] Couldn't find the LootTable -"+lootTable+"- !");
     }
 
+    public static void UnableToFindLootBag(String lootBag) {
+        System.err.println("[PandeLoot] Couldn't find the LootBag -"+lootBag+"- !");
+    }
+
 }

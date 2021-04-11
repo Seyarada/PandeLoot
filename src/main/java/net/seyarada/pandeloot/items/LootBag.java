@@ -1,8 +1,11 @@
-package net.seyarada.pandeloot.rewards;
+package net.seyarada.pandeloot.items;
 
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.nms.NMSManager;
+import net.seyarada.pandeloot.rewards.NBTNames;
+import net.seyarada.pandeloot.rewards.RewardContainer;
+import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Item;
@@ -28,6 +31,7 @@ public class LootBag extends RewardContainer {
         List<RewardLine> rewards = RewardLine.StringListToRewardList(lootBag.getStringList("Rewards"));
         DropManager dropManager = new DropManager(player, item.getLocation(), rewards);
         dropManager.initDrops();
+        NMSManager.playArm(player);
         int delay = dropManager.delay;
 
         if(delay>0)

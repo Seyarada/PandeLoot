@@ -30,7 +30,7 @@ public class ColorUtil {
             return;
         }
 
-        setItemColor(item, color);
+        setItemColor(item, color, player);
 
         if (player != null) {
             new ParticleTrail(item, color, player);
@@ -45,17 +45,23 @@ public class ColorUtil {
         }
     }
 
-    public static void setItemColor(Item item, String color) {
+    public static void setItemColor(Item item, String color, Player player) {
         color = getColor(item, color);
-        final String teamName = "PdLt." + ChatColor.valueOf(color).toString();
+        final String teamName = "PandeLoot" + ChatColor.valueOf(color).toString();
 
-        if (board.getTeam(teamName) == null) {
-            Team team = board.registerNewTeam(teamName);
+        Scoreboard toUseBoard;
+        if(player==null)
+            toUseBoard = board;
+        else
+            toUseBoard = player.getScoreboard();
+
+        if (toUseBoard.getTeam(teamName) == null) {
+            Team team = toUseBoard.registerNewTeam(teamName);
             team.setColor(ChatColor.valueOf(color));
             team.addEntry(item.getUniqueId().toString());
             return;
         }
-        board.getTeam(teamName).addEntry(item.getUniqueId().toString());
+        toUseBoard.getTeam(teamName).addEntry(item.getUniqueId().toString());
     }
 
     public static String getColor(Item item, String color) {

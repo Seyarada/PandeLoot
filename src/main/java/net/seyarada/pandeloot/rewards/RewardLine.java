@@ -5,6 +5,7 @@ import net.seyarada.pandeloot.compatibility.MMOItemsCompatibility;
 import net.seyarada.pandeloot.compatibility.OraxenCompatibility;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.items.LootBag;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,16 +21,29 @@ public class RewardLine {
     private String origin;
     private String item;
     private String line;
-    private int amount = 1;
+    public int amount = 1;
     private String chance = "1";
 
     private int start;
     private int end;
     private int colon;
 
+    public ItemStack itemStack;
+
     private boolean skip;
 
     public Map<String, Object> options = new HashMap<>();
+
+    public RewardLine(String string, boolean store) {
+        // This reward simply stores a line which is going to be executed by external plugins
+        if(store) {
+            line = string;
+            start = line.indexOf("{");
+            end = line.lastIndexOf("}");
+            colon = line.indexOf(":");
+            setData(line, colon, false);
+        }
+    }
 
     public RewardLine(String string) {
         line = string;
@@ -41,13 +55,13 @@ public class RewardLine {
         // Rewards:
         // - diamond_block || - minecraft:diamond_block
         if(start == -1 && end == -1) {
-            setData(line, colon);
+            setData(line, colon, true);
         }
 
         // Both brackets found
         if(start != -1 && end != -1) {
 
-            setData(line, colon);
+            setData(line, colon, true);
 
             // Stores what's inside the brackets as options
             //                 +1 so it doesn't includes the bracket
@@ -67,7 +81,7 @@ public class RewardLine {
         }
     }
 
-    public void setData(String line, int colonLocation) {
+    public void setData(String line, int colonLocation, boolean setValues) {
 
         if(start!=-1 && end!=-1) {
             // If the line has brackets, remove them
@@ -89,7 +103,7 @@ public class RewardLine {
         if(item.contains(";"))
             item = item.split(";")[0];
 
-        if(splitLine.length>1) { // More than one element found when splitting by " "
+        if(setValues && splitLine.length>1) { // More than one element found when splitting by " "
 
             amount = Integer.parseInt(splitLine[1]);
             if(splitLine.length>2)
@@ -135,6 +149,11 @@ public class RewardLine {
     }
 
     public ItemStack getItemStack() {
+
+        if(itemStack!=null) {
+            return itemStack;
+        }
+
         switch (origin) {
             case "minecraft":
                 Material material = Material.valueOf(item.toUpperCase());
@@ -164,6 +183,8 @@ public class RewardLine {
     public void setSkip(boolean skip) {
         this.skip = skip;
     }
+
+    public void setOrigin(String newOrigin) { this.origin = newOrigin; }
 
     public boolean getSkip() {
         return skip;
