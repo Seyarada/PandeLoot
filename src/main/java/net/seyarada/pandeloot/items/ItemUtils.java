@@ -7,7 +7,9 @@ import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.drops.LootBag;
 import io.lumine.xikage.mythicmobs.drops.*;
 import io.lumine.xikage.mythicmobs.mobs.ActiveMob;
+import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.rewards.RewardContainer;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.entity.Player;
 
@@ -64,6 +66,8 @@ public class ItemUtils {
                         }
                     }
                     break;
+                case "lootbag":
+                    RewardContainer.setParentTable(i, Config.getLootBagRaw(i.getItem()));
                 default:
                     if(i.isShared()) {
                         i.setChance(String.valueOf(1d/playerSize));

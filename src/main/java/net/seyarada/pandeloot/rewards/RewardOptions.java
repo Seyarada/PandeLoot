@@ -48,7 +48,6 @@ public class RewardOptions {
     public boolean dAvatar;
 
     //public String holobroadcast;
-    //private DropTable dropTable;
 
     public final RewardLine reward;
 
@@ -58,7 +57,7 @@ public class RewardOptions {
 
     public void parseEffects() {
         this.message = reward.getOption(Config.getDefault("Message"), "message","msg");
-        this.color = reward.getOption(Config.getDefault("Color"), "color");
+        this.color = reward.getOption(Config.getDefault("Color"), "color", "colour");
         this.title = reward.getOption(Config.getDefault("Title"), "title");
         this.subtitle = reward.getOption(Config.getDefault("Subtitle"), "subtitle");
         this.sound = reward.getOption(Config.getDefault("Sound"), "sound");

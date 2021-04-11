@@ -1,6 +1,6 @@
 name: PandeLoot
 main: net.seyarada.pandeloot.PandeLoot
-version: 0.1.2
+version: 0.1.2a
 api-version: 1.13
 softdepend: [MythicMobs, MythicArtifacts, PlaceholderAPI, Vault, HoloBroadcast, MMOItems, Oraxen, DiscordSRV]
 commands:

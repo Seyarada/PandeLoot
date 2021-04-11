@@ -17,6 +17,9 @@ public class DropManager {
     private DamageUtil damageUtil;
     private Location location;
 
+    private double randomLocX;
+    private double randomLocZ;
+
     public int delay;
 
     public DropManager(List<Player> players, List<RewardLine> rewards) {
@@ -48,6 +51,7 @@ public class DropManager {
 
     public void initDrops() {
         List<RewardLine> playerDrops = new ArrayList<>();
+
         for(Player i : players) {
             playerDrops.clear();
             ItemUtils.collectRewards(rewards, playerDrops, players.size(), damageUtil, i);

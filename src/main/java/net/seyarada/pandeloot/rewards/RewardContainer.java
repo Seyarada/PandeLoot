@@ -69,6 +69,7 @@ public class RewardContainer {
     }
 
     public List<RewardLine> getDrops() {
+        System.out.println(1);
         List<RewardLine> drops = new ArrayList<>();
 
         if(amountGoal<=0) {                                             // No special limiters found, so this
@@ -77,7 +78,10 @@ public class RewardContainer {
                 drops.add(lineConfig);
             }
             List<RewardLine> items = getRawDropsParsingConditions();
-            while(drops.size()<guaranteed) {
+            while(drops.size()<guaranteed && items.size()>0) {
+                System.out.println("Drops Size: "+drops.size());
+                System.out.println("Guaranteed: "+guaranteed);
+                System.out.println("Size: "+items.size());
                 RewardLine item = doRoll(items);                             // by item until it reaches the desired
                 List<String> lS = new ArrayList<>();
                 for(RewardLine m : drops) {
@@ -92,8 +96,11 @@ public class RewardContainer {
                 items = getRawDrops();
             else
                 items = getRawDropsParsingConditions();
-            while(amountDropped<amountGoal) {
+            while(amountDropped<amountGoal && items.size()>0) {
 
+                System.out.println("Dropped: "+amountDropped);
+                System.out.println("Goal: "+amountGoal);
+                System.out.println("Size: "+items.size());
                 RewardLine item = doRoll(items);                             // by item until it reaches the desired
                 if(item!=null)
                     drops.add(item);
@@ -104,6 +111,7 @@ public class RewardContainer {
     }
 
     private RewardLine doRoll(List<RewardLine> items) {
+        System.out.println(2);
 
         if(items.size()==0) return null;
 
@@ -130,6 +138,7 @@ public class RewardContainer {
     }
 
     private List<RewardLine> getRawDrops() {
+        System.out.println(3);
         List<RewardLine> drops = new ArrayList<>();
         for (String item : rewardContainer.getStringList("Rewards")) {
             RewardLine lineConfig = new RewardLine(item);
@@ -140,6 +149,7 @@ public class RewardContainer {
     }
 
     private List<RewardLine> getRawDropsParsingConditions() {
+        System.out.println(4);
         List<RewardLine> drops = new ArrayList<>();
         List<RewardLine> rewards = RewardLine.StringListToRewardList(rewardContainer.getStringList("Rewards"));
 
@@ -154,6 +164,7 @@ public class RewardContainer {
     }
 
     private List<RewardLine> getRawDropsParsingChance() {
+        System.out.println(5);
         List<RewardLine> drops = new ArrayList<>();
         List<RewardLine> rewards = RewardLine.StringListToRewardList(rewardContainer.getStringList("Rewards"));
 

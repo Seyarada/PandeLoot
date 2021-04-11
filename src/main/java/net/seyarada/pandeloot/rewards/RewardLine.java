@@ -22,7 +22,7 @@ public class RewardLine {
     private String item;
     private String line;
     public int amount = 1;
-    private String chance = "1";
+    public String chance = "1";
 
     private int start;
     private int end;

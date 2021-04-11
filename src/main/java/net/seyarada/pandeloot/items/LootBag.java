@@ -1,12 +1,15 @@
 package net.seyarada.pandeloot.items;
 
 import net.seyarada.pandeloot.PandeLoot;
+import net.seyarada.pandeloot.drops.DropConditions;
 import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.rewards.RewardContainer;
 import net.seyarada.pandeloot.rewards.RewardLine;
+import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -14,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LootBag extends RewardContainer {
@@ -24,15 +28,22 @@ public class LootBag extends RewardContainer {
     public LootBag(ConfigurationSection lootBag, RewardLine line) {
         super(lootBag, line);
         this.lootBag = lootBag;
-        this.line = line;
+        this.line = RewardContainer.setParentTable(line, lootBag);
     }
 
     public void doGroundDrop(Player player, Item item) {
-        List<RewardLine> rewards = RewardLine.StringListToRewardList(lootBag.getStringList("Rewards"));
+        List<RewardLine> toCollect = getDrops();
+        List<RewardLine> rewards = new ArrayList<>();
+
+        ItemUtils.collectRewards(toCollect, rewards, 1, null, player);
+
         DropManager dropManager = new DropManager(player, item.getLocation(), rewards);
         dropManager.initDrops();
         NMSManager.playArm(player);
         int delay = dropManager.delay;
+
+        item.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, item.getLocation(), 10 ,0,0.15,0, 0.3);
+        item.getWorld().spawnParticle(Particle.SMOKE_LARGE, item.getLocation(), 5 ,0,0.15,0, 0.1);
 
         if(delay>0)
             item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.onUse, "true"));
