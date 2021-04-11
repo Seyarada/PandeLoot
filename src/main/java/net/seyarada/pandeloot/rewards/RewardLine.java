@@ -194,6 +194,8 @@ public class RewardLine {
 
     public boolean shouldStop() { return Boolean.parseBoolean(getOption("false", "stop")); }
 
+    public boolean asLootTable() { return Boolean.parseBoolean(getOption("false", "asloottable", "aslt")); }
+
     public int getDelay() {
         return Integer.parseInt(getOption("0", "delay"));
     }

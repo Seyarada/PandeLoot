@@ -67,7 +67,15 @@ public class ItemUtils {
                     }
                     break;
                 case "lootbag":
-                    RewardContainer.setParentTable(i, Config.getLootBagRaw(i.getItem()));
+                    if(i.asLootTable()) {
+                        lootTable = new LootTable(Config.getLootBagRaw(i.getItem()), i);
+                        lootTable.setDamageUtil(damageUtil);
+                        lootTable.setPlayer(player);
+                        j = lootTable.getDrops();
+                        collectRewards(j, store, playerSize, damageUtil, player);
+                        break;
+                    }
+                    else RewardContainer.setParentTable(i, Config.getLootBagRaw(i.getItem()));
                 default:
                     if(i.isShared()) {
                         i.setChance(String.valueOf(1d/playerSize));

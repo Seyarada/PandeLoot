@@ -19,6 +19,7 @@ public class RewardOptions {
     public boolean stackable;
     public boolean preventpickup;
     public boolean playonpickup;
+    public boolean asloottable;
     public int titleDuration;
     public int titleFade;
     public int delay;
@@ -72,6 +73,7 @@ public class RewardOptions {
         this.explode = Boolean.parseBoolean(reward.getOption(Config.getDefault("Explode"), "explode"));
         this.preventpickup = Boolean.parseBoolean(reward.getOption(Config.getDefault("PreventPickup"), "preventpickup","pickup"));
         this.playonpickup = Boolean.parseBoolean(reward.getOption(Config.getDefault("PlayOnPickup"), "playonpickup","onpickup"));
+        this.asloottable = Boolean.parseBoolean(reward.getOption(Config.getDefault("AsLootTable"), "asloottable","aslt"));
 
         this.titleDuration = Integer.parseInt(reward.getOption(Config.getDefault("TitleDuration"), "titleduration","td"));
         this.titleFade = Integer.parseInt(reward.getOption(Config.getDefault("TitleFade"), "titlefade","tf"));

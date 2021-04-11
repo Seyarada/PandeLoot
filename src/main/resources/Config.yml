@@ -37,6 +37,7 @@ DefaultValues:
   Explode: true
   PreventPickup: false
   PlayOnPickup: false
+  AsLootTable: false
   TitleDuration: 20
   TitleFade: 20
   Delay: 0
