@@ -1,5 +1,6 @@
 package net.seyarada.pandeloot.utils;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.seyarada.pandeloot.Boosts;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import org.bukkit.ChatColor;
@@ -29,6 +30,8 @@ public class PlaceholderUtil {
 
         if(player!=null) {
 
+            PlaceholderAPI.setPlaceholders(player, i);
+
             i = fastReplace(i, "%player%", player.getName());
             pendingBoost = Boosts.getPlayerBoost(player.getName());
 
@@ -51,11 +54,22 @@ public class PlaceholderUtil {
                     i = fastReplace(i, "%player.pdmg100%", String.valueOf(df.format(damageUtil.getPercentageDamage(player)*100)));
                     i = fastReplace(i, "%player.rank%", df.format(damageUtil.getPlayerRank(player)));
                 }
+            }
+        }
 
-                if(i.contains("%mob.")) {
-                    i = fastReplace(i, "%mob.name%", damageUtil.getEntityName());
-                    i = fastReplace(i, "%mob.hp%", String.valueOf(damageUtil.getEntityHealth()));
-                }
+        if(damageUtil!=null) {
+            if(i.contains("%mob.")) {
+                i = fastReplace(i, "%mob.name%", damageUtil.getEntityName());
+                i = fastReplace(i, "%mob.hp%", String.valueOf(damageUtil.getEntityHealth()));
+            }
+
+            if(damageUtil.lastHit!=null && i.contains("%lasthit")) {
+                DecimalFormat df = new DecimalFormat("#.##");
+                i = fastReplace(i, "%lasthit%", damageUtil.lastHit.getName());
+                i = fastReplace(i, "%lasthit.dmg%", String.valueOf(df.format(damageUtil.getPlayerDamage(damageUtil.lastHit))));
+                i = fastReplace(i, "%lasthit.pdmg%", String.valueOf(df.format(damageUtil.getPercentageDamage(damageUtil.lastHit))));
+                i = fastReplace(i, "%lasthit.pdmg100%", String.valueOf(df.format(damageUtil.getPercentageDamage(damageUtil.lastHit) * 100)));
+                i = fastReplace(i, "%lasthit.rank%", df.format(damageUtil.getPlayerRank(damageUtil.lastHit)));
             }
         }
 

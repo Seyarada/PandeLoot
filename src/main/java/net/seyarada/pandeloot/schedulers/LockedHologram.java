@@ -16,12 +16,16 @@ import java.util.List;
 
 public class LockedHologram {
 
+
     private int id;
+    private static List<ArmorStand> totalHolograms = new ArrayList<>();
     private List<ArmorStand> holograms = new ArrayList<>();
 
     // This generates a hologram(s) that locks into an  entity/item
 
     public LockedHologram(Entity toTrack, List<String> toDisplay, Player player) {
+
+        if(toTrack==null) return;
 
         Collections.reverse(toDisplay);
         Plugin plugin = PandeLoot.getInstance();
@@ -34,8 +38,10 @@ public class LockedHologram {
                 updateLocation(toTrack.getLocation(), holograms);
             } else {
                 for(ArmorStand i : holograms) {
-                    if(i!=null && i.isValid())
+                    if(i!=null && i.isValid()) {
+                        totalHolograms.remove(i);
                         i.remove();
+                    }
                 }
                 Bukkit.getScheduler().cancelTask(id);
             }
@@ -66,6 +72,7 @@ public class LockedHologram {
 
             new HideEntity(armorStand, player);
             holograms.add(armorStand);
+            totalHolograms.add(armorStand);
         }
 
     }
@@ -81,6 +88,10 @@ public class LockedHologram {
             i.teleport(newLoc);
         }
 
+    }
+
+    public List<ArmorStand> getArmorStands() {
+        return totalHolograms;
     }
 
 }

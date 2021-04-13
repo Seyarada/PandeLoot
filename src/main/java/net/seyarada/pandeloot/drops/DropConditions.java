@@ -1,5 +1,6 @@
 package net.seyarada.pandeloot.drops;
 
+import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class DropConditions {
     }
 
     public static void runConditions(List<RewardLine> rewards, Player p, DamageUtil u) {
-        rewards.removeIf(i -> (!chance(i,p,u) || !damage(i,p,u) || !top(i,p,u)|| !permission(i,p)) && !i.getSkip());
+        rewards.removeIf(i -> (!chance(i,p,u) || !damage(i,p,u) || !top(i,p,u) || !permission(i,p) || !lasthit(i,p,u)) && !i.getSkip());
     }
 
     public static boolean chance(RewardLine i, Player p, DamageUtil u) {
@@ -86,6 +87,13 @@ public class DropConditions {
         if(permission==null) return true;
 
         return player.hasPermission(permission);
+    }
+
+    public static boolean lasthit(RewardLine rewardLine, Player player, DamageUtil damageUtil) {
+        boolean lastHit = Boolean.parseBoolean(rewardLine.getOption(Config.getDefault("LastHit"), "lasthit"));
+        if(lastHit)
+            return player == damageUtil.lastHit;
+        return true;
     }
 
 }

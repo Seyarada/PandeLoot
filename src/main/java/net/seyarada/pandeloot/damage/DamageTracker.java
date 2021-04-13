@@ -24,10 +24,15 @@ public class DamageTracker implements Listener {
     // Stores the mobs registered as mobs that should have the damage tracked
     public static Map<UUID, MobOptions> loadedMobs = new HashMap<>();
 
+
+    public static Map<UUID, Player> lastHits = new HashMap<>();
+
     public static void addPlayerDamage(UUID mob, Player player, Double damage) {
 
-        if( ((LivingEntity) Bukkit.getEntity(mob) ).getHealth() < damage )
-            damage = ((LivingEntity)Bukkit.getEntity(mob) ).getHealth();
+        if( ((LivingEntity) Bukkit.getEntity(mob) ).getHealth() < damage ) {
+            damage = ((LivingEntity) Bukkit.getEntity(mob)).getHealth();
+            lastHits.put(mob, player);
+        }
 
         // Creates the map if it doesn't exists
         if(!damageTracker.containsKey(mob)) {

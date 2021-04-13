@@ -2,6 +2,9 @@ package net.seyarada.pandeloot.rewards;
 
 import net.seyarada.pandeloot.Config;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class RewardOptions {
 
     public String message;
@@ -20,6 +23,7 @@ public class RewardOptions {
     public boolean preventpickup;
     public boolean playonpickup;
     public boolean asloottable;
+    public boolean lasthit;
     public int titleDuration;
     public int titleFade;
     public int delay;
@@ -40,7 +44,6 @@ public class RewardOptions {
     public int experience;
     public double money;
 
-
     public String dTitle;
     public String dMessage;
     public String dChannel;
@@ -48,7 +51,7 @@ public class RewardOptions {
     public String dLink;
     public boolean dAvatar;
 
-    //public String holobroadcast;
+    public String holoBroadcast;
 
     public final RewardLine reward;
 
@@ -67,6 +70,7 @@ public class RewardOptions {
         this.parent = reward.getOption(Config.getDefault("Parent"), "parent");
         this.explodeType = reward.getOption(Config.getDefault("ExplodeType"), "explodeType");
         this.hologram = reward.getOption(Config.getDefault("Hologram"), "hologram");
+        this.holoBroadcast = reward.getOption(Config.getDefault("HoloBroadcast"), "holobroadcast", "hb");
 
         this.stackable = Boolean.parseBoolean(reward.getOption(Config.getDefault("Stackable"), "stackable","stacks"));
         this.glow = Boolean.parseBoolean(reward.getOption(Config.getDefault("Glow"), "glow"));
@@ -74,6 +78,7 @@ public class RewardOptions {
         this.preventpickup = Boolean.parseBoolean(reward.getOption(Config.getDefault("PreventPickup"), "preventpickup","pickup"));
         this.playonpickup = Boolean.parseBoolean(reward.getOption(Config.getDefault("PlayOnPickup"), "playonpickup","onpickup"));
         this.asloottable = Boolean.parseBoolean(reward.getOption(Config.getDefault("AsLootTable"), "asloottable","aslt"));
+        this.lasthit = Boolean.parseBoolean(reward.getOption(Config.getDefault("LastHit"), "lasthit"));
 
         this.titleDuration = Integer.parseInt(reward.getOption(Config.getDefault("TitleDuration"), "titleduration","td"));
         this.titleFade = Integer.parseInt(reward.getOption(Config.getDefault("TitleFade"), "titlefade","tf"));

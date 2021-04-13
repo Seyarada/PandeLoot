@@ -22,6 +22,7 @@ public class RainbowRunner {
 
         Plugin plugin = PandeLoot.getInstance();
         AtomicInteger tick = new AtomicInteger(-1);
+        int frequency = Config.getRainbowFrequency();
 
         id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
 
@@ -50,7 +51,7 @@ public class RainbowRunner {
             } else {
                 Bukkit.getScheduler().cancelTask(id);
             }
-        }, 0, 3);
+        }, 0, frequency);
     }
 
     public RainbowRunner(Item item, Player player, double beam) {

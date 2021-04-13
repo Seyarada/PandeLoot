@@ -102,24 +102,6 @@ public class NMSManager {
         }
     }
 
-    public static void playArm(Player player) {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        switch (version) {
-            case "v1_16_R3":
-                V1_16_R3.playArm(player); break;
-            case "v1_16_R2":
-                V1_16_R2.playArm(player); break;
-            case "v1_16_R1":
-                V1_16_R1.playArm(player); break;
-            case "v1_15_R1":
-                V1_15_R1.playArm(player); break;
-            case "v1_14_R1":
-                V1_14_R1.playArm(player); break;
-            case "v1_13_R2":
-                V1_13_R2.playArm(player); break;
-        }
-    }
-
     public static void spawnHologram(DamageUtil damageUtil) {
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {

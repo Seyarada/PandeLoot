@@ -1,5 +1,7 @@
 Settings:
   RainbowFrequency: 3
+  PlayArmWhenOpeningLootBag: true
+  OnlyPlayArmIfBothEmpty: false
 
 Announcements:
   ScoreHologram:
@@ -32,12 +34,14 @@ DefaultValues:
   Parent: null
   ExplodeType: Spread
   Hologram: Display
+  HoloBroadcast: null
   Stackable: true
   Glow: true
   Explode: true
   PreventPickup: false
   PlayOnPickup: false
   AsLootTable: false
+  LastHit: false
   TitleDuration: 20
   TitleFade: 20
   Delay: 0

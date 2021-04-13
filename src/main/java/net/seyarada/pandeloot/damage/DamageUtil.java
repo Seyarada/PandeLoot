@@ -19,6 +19,8 @@ public class DamageUtil {
     private final Double[] damage;
     private final UUID uuid;
 
+    public Player lastHit;
+
     public final Entity entity;
 
     private final Location location;

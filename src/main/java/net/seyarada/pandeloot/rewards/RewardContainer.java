@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -24,6 +25,9 @@ public class RewardContainer {
 
     private Player player;
     private DamageUtil damageUtil;
+
+    // This is awful, I know
+    public static List<String> bannedInherit = Arrays.asList("stop", "broadcast", "command", "delay", "message", "title", "subtitle", "actionbar", "rewards");
 
     public RewardContainer(ConfigurationSection rewardContainer, RewardLine line) {
         this.rewardContainer = rewardContainer;
@@ -182,7 +186,10 @@ public class RewardContainer {
     }
 
     private void setLootTableOriginOptions() {
+        // TODO: Improve this
         for (String key : line.options.keySet()) {
+            if(bannedInherit.contains(key)) continue;
+
             String value = String.valueOf(line.options.get(key));
             if(!rewardContainer.contains(key)) {
                 rewardContainer.set(key, value);

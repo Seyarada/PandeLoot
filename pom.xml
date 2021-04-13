@@ -6,7 +6,7 @@
 
     <groupId>net.seyarada</groupId>
     <artifactId>PandeLoot</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -39,11 +39,18 @@
             <url>http://mvn.lumine.io/repository/maven-releases/</url>
         </repository>
 
-        <!-- discordsrv -->
+        <!-- Discordsrv -->
         <repository>
             <id>Scarsz-Nexus</id>
             <url>https://nexus.scarsz.me/content/groups/public/</url>
         </repository>
+
+        <!-- PAPI -->
+        <repository>
+            <id>placeholderapi</id>
+            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+
 
     </repositories>
 
@@ -95,6 +102,29 @@
             <artifactId>discordsrv</artifactId>
             <version>1.21.1</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- PAPI -->
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.10.9</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Vault -->
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- HoloBroadcast -->
+        <dependency>
+            <groupId>com.github.RomainStorai</groupId>
+            <artifactId>HolobroadcastAPI</artifactId>
+            <version>v1.10.1</version>
         </dependency>
 
         <!-- NMS -->

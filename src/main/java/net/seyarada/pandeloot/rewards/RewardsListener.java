@@ -78,22 +78,27 @@ public class RewardsListener implements Listener {
             Player player = (Player) e.getEntity();
             ItemStack iS = e.getItem().getItemStack();
 
-            if(NMSManager.hasTag(iS, NBTNames.preventPickup) || NMSManager.hasTag(iS, NBTNames.onUse) )
+            if (NMSManager.hasTag(iS, NBTNames.preventPickup) || NMSManager.hasTag(iS, NBTNames.onUse)) {
                 e.setCancelled(true);
+                return;
+            }
 
             if(NMSManager.hasTag(iS, NBTNames.root) && !NMSManager.getTag(iS, NBTNames.root).equals(player.getName())) {
                 e.setCancelled(true);
-
-            } else {
-                if(NMSManager.hasTag(iS, NBTNames.playOnPickup)) {
-                    DropItem source = DropEffects.playOnPickupStorage.get(UUID.fromString(NMSManager.getTag(iS, NBTNames.playOnPickup)));
-                    new DropEffects(source, true);
-                }
-
-                NMSManager.removeNBT(iS, NBTNames.playOnPickup);
-                NMSManager.removeNBT(iS, NBTNames.preventStack);
-                NMSManager.removeNBT(iS, NBTNames.root); // TODO Change this to e.getItem / e.getEntity instead of  an event
+                return;
             }
+
+            if(NMSManager.hasTag(iS, NBTNames.playOnPickup)) {
+                DropItem source = DropEffects.playOnPickupStorage.get(UUID.fromString(NMSManager.getTag(iS, NBTNames.playOnPickup)));
+                new DropEffects(source, true);
+            }
+
+            iS = NMSManager.removeNBT(iS, NBTNames.playOnPickup);
+            e.getItem().setItemStack( iS );
+            iS = NMSManager.removeNBT(iS, NBTNames.preventStack);
+            e.getItem().setItemStack( iS );
+            iS = NMSManager.removeNBT(iS, NBTNames.root);
+            e.getItem().setItemStack( iS );
         }
     }
 
@@ -127,6 +132,10 @@ public class RewardsListener implements Listener {
         List<RewardLine> rewards = RewardLine.StringListToRewardList(strings);
 
         DamageUtil damageUtil = new DamageUtil(uuid);
+        if(DamageTracker.lastHits.containsKey(uuid)) {
+            damageUtil.lastHit = DamageTracker.lastHits.get(uuid);
+            DamageTracker.lastHits.remove(uuid);
+        }
         DropManager manager = new DropManager(Arrays.asList(damageUtil.getPlayers()), rewards);
 
         if(rank) ChatUtil.announceChatRank(damageUtil);

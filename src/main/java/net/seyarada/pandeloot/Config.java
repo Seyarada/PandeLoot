@@ -155,12 +155,12 @@ public class Config {
     public static List<String> getScoreHologram() {
         return config.getStringList("Announcements.ScoreHologram");
     }
-
     public static List<String> getScoreMessage() {
         return config.getStringList("Announcements.ScoreMessage");
     }
-
     public static int getRainbowFrequency() { return config.getInt("Settings.RainbowFrequency"); }
+    public static boolean getPlayArm() { return config.getBoolean("Settings.PlayArmWhenOpeningLootBag"); }
+    public static boolean getPlayArmEmpty() { return config.getBoolean("Settings.OnlyPlayArmIfBothEmpty"); }
 
     public static ConfigurationSection getMob(Entity entity) {
 

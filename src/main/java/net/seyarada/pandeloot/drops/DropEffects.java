@@ -2,6 +2,10 @@ package net.seyarada.pandeloot.drops;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.economy.Economy;
+import net.mystipvp.holobroadcast.holograms.HologramPlayer;
+import net.mystipvp.holobroadcast.holograms.HologramPlayersManager;
+import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.schedulers.LockedHologram;
@@ -132,8 +136,19 @@ public class DropEffects {
             src.player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(src.actionbar));
         }
 
+        if(src.money>0 && Bukkit.getServer().getPluginManager().getPlugin("Vault") != null) {
+            Economy economy = PandeLoot.getEconomy();
+            economy.depositPlayer(src.player, src.money);
+        }
+
         if (src.experience > 0)
             src.player.giveExp(src.experience);
+
+        if (src.holoBroadcast != null && Bukkit.getServer().getPluginManager().getPlugin("HoloBroadcast") != null) {
+            HologramPlayersManager manager = HologramPlayersManager.getInstance();
+            HologramPlayer holoPlayer = manager.getHologramPlayerFromUUID(src.player.getUniqueId());
+            holoPlayer.showHUD(src.holoBroadcast, -1);
+        }
     }
 
     private void runGeneralEffects() {
@@ -155,8 +170,15 @@ public class DropEffects {
 
     private void doRadialDrop() {
         Map<Double, Integer> advCounter = (Map<Double, Integer>) src.reward.options.get("RadialDrop");
+
         int n = advCounter.get(src.explodeRadius);
         int x = (int) src.reward.options.get("ThisItem");
+
+        if(n==1) {
+            Random r = new Random();
+            n = r.nextInt(99) + 1;
+            x = r.nextInt(99) + 1;
+        }
 
         double angle = 2 * Math.PI / n;
         double cos = Math.cos(angle * x);

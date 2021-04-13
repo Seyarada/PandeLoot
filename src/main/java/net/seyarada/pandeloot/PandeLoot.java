@@ -1,15 +1,19 @@
 package net.seyarada.pandeloot;
 
+import net.milkbowl.vault.economy.Economy;
 import net.seyarada.pandeloot.commands.*;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.rewards.RewardsListener;
+import net.seyarada.pandeloot.schedulers.LockedHologram;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PandeLoot extends JavaPlugin {
 
     private static PandeLoot instance;
-
+    private static Economy econ = null;
 
     @Override
     public void onEnable() {
@@ -34,11 +38,34 @@ public class PandeLoot extends JavaPlugin {
 
         this.getCommand("pandeloot").setTabCompleter(new AutoComplete());
 
+        setupEconomy();
+
     }
 
     @Override
     public void onDisable() {
+        // Removes possible holograms that may be alive at the time of reload, so they don't get stuck
+        // in a "frozen" state.
+        for(ArmorStand i : new LockedHologram(null,null,null).getArmorStands()) {
+            if(i!=null && i.isValid()) {
+                i.remove();
+            }
+        }
+    }
 
+    private void setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return;
+        }
+        econ = rsp.getProvider();
+    }
+
+    public static Economy getEconomy() {
+        return econ;
     }
 
     public static PandeLoot getInstance() {

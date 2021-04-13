@@ -201,7 +201,7 @@ public class RewardLine {
     }
 
     public double getExplodeRadius() {
-        return Double.parseDouble(getOption("3", "exploderadius"));
+        return Double.parseDouble(getOption(Config.getDefault("ExplodeRadius"), "exploderadius"));
     }
 
     public static List<RewardLine> StringListToRewardList(List<String> strings) {

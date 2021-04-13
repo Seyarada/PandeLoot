@@ -1,5 +1,6 @@
 package net.seyarada.pandeloot.items;
 
+import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.drops.DropConditions;
 import net.seyarada.pandeloot.drops.DropManager;
@@ -39,7 +40,9 @@ public class LootBag extends RewardContainer {
 
         DropManager dropManager = new DropManager(player, item.getLocation(), rewards);
         dropManager.initDrops();
-        NMSManager.playArm(player);
+
+        playArm(player);
+
         int delay = dropManager.delay;
 
         item.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, item.getLocation(), 10 ,0,0.15,0, 0.3);
@@ -73,6 +76,21 @@ public class LootBag extends RewardContainer {
         itemStack.setItemMeta(meta);
 
         return NMSManager.addNBT(itemStack, NBTNames.bag, line.getItem());
+
+    }
+
+    private void playArm(Player player) {
+        if(player==null) return;
+
+        if(Config.getPlayArm()) {
+            if(Config.getPlayArmEmpty()) {
+                Material mainHand = player.getInventory().getItemInMainHand().getType();
+                Material offHand = player.getInventory().getItemInOffHand().getType();
+                if(mainHand==Material.AIR && offHand==Material.AIR)
+                    player.swingMainHand();
+            } else player.swingMainHand();
+
+        }
 
     }
 

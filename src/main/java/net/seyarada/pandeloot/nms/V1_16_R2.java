@@ -58,13 +58,6 @@ public class V1_16_R2 {
         ((CraftPlayer) entity).getHandle().playerConnection.sendPacket(packet);
     }
 
-    public static void playArm(Player player) {
-        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
-        EntityLiving living = ((CraftLivingEntity) player).getHandle();
-        PacketPlayOutAnimation swingArm = new PacketPlayOutAnimation(living, 0);
-        connection.sendPacket(swingArm);
-    }
-
     public static void spawnHologram(DamageUtil damageUtil) {
         UUID uuid = damageUtil.getUUID();
         for(Player player : DamageTracker.get(uuid).keySet()) {

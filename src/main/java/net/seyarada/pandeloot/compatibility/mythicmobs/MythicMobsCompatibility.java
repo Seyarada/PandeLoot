@@ -17,6 +17,7 @@ import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import net.seyarada.pandeloot.utils.ChatUtil;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -39,8 +40,12 @@ public class MythicMobsCompatibility implements Listener {
     @EventHandler
     public void onDeath(MythicMobDeathEvent e) {
         UUID mob = e.getEntity().getUniqueId();
+
+        // Don't drop if the mob isn't loaded or nobody has damaged it
         if(!DamageTracker.loadedMobs.containsKey(mob)) return;
         DamageTracker.loadedMobs.remove(mob);
+        if(!DamageTracker.damageTracker.containsKey(mob)) return;
+        if(DamageTracker.get(mob).size()==0) return;
 
         MythicConfig config = e.getMobType().getConfig();
         boolean rank = config.getBoolean("Options.ScoreMessage");
@@ -50,6 +55,7 @@ public class MythicMobsCompatibility implements Listener {
         List<RewardLine> rewards = RewardLine.StringListToRewardList(strings);
 
         DamageUtil damageUtil = new DamageUtil(mob);
+        if(e.getKiller() instanceof Player) damageUtil.lastHit = (Player) e.getKiller();
         DropManager manager = new DropManager(Arrays.asList(damageUtil.getPlayers()), rewards);
 
         if(rank) ChatUtil.announceChatRank(damageUtil);
