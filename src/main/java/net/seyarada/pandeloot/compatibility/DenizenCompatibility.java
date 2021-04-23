@@ -1,18 +1,7 @@
 package net.seyarada.pandeloot.compatibility;
 
 import com.denizenscript.denizen.objects.ItemTag;
-import com.denizenscript.denizen.utilities.debugging.Debug;
-import com.denizenscript.denizencore.DenizenCore;
-import com.denizenscript.denizencore.objects.ObjectTag;
-import com.denizenscript.denizencore.objects.core.*;
-import com.denizenscript.denizencore.scripts.ScriptEntry;
-import com.denizenscript.denizencore.scripts.queues.ScriptQueue;
-import com.denizenscript.denizencore.utilities.ScriptUtilities;
-import com.denizenscript.denizencore.utilities.text.StringHolder;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class DenizenCompatibility {
 
@@ -21,6 +10,7 @@ public class DenizenCompatibility {
         return itemTag.getItemStack();
     }
 
+    /*
     public void execute(String scriptName) {
         ScriptTag scripTag = new ScriptTag(scriptName);
         ScriptEntry scriptEntry = new ScriptEntry("Run", null, scripTag.getContainer());
@@ -68,5 +58,6 @@ public class DenizenCompatibility {
             Debug.echoError(scriptEntry.getResidingQueue(), "Script run failed!");
         }
     }
+    */
 
 }

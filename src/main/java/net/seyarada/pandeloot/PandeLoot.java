@@ -5,15 +5,18 @@ import net.seyarada.pandeloot.commands.*;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.rewards.RewardsListener;
-import net.seyarada.pandeloot.schedulers.LockedHologram;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PandeLoot extends JavaPlugin {
 
     private static PandeLoot instance;
     private static Economy econ = null;
+    public static final List<ArmorStand> totalHolograms = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -47,7 +50,7 @@ public class PandeLoot extends JavaPlugin {
         // Removes possible holograms that may be alive at the time of reload, so they don't get stuck
         // in a "frozen" state.
         try {
-            for(ArmorStand i : LockedHologram.totalHolograms) {
+            for(ArmorStand i : totalHolograms) {
                 if(i!=null && i.isValid()) {
                     i.remove();
                 }

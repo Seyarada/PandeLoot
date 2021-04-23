@@ -150,10 +150,13 @@ public class RewardLine extends RewardOptions {
                 return MIGeneratorCompatibility.getItem(item, this, player);
             case "oraxen":
                 return OraxenCompatibility.getItem(item);
+            /*
             case "denizenscript":
             case "dscript":
                 new DenizenCompatibility().execute(item);
                 return new ItemStack(Material.AIR, 1);
+
+             */
             case "denizenitem":
             case "ditem":
                 return DenizenCompatibility.getItem(item);

@@ -20,7 +20,6 @@ import java.util.*;
 public class LockedHologram {
 
     private int id;
-    public static final List<ArmorStand> totalHolograms = new ArrayList<>();
     private List<ArmorStand> holograms = new ArrayList<>();
 
     private ArmorStand abandonEntity;
@@ -77,7 +76,7 @@ public class LockedHologram {
             } else {
                 for(ArmorStand i : holograms) {
                     if(i!=null && i.isValid()) {
-                        totalHolograms.remove(i);
+                        PandeLoot.totalHolograms.remove(i);
                         i.remove();
                     }
                 }
@@ -117,7 +116,7 @@ public class LockedHologram {
                 new HideEntity(armorStand, player);
 
             holograms.add(armorStand);
-            totalHolograms.add(armorStand);
+            PandeLoot.totalHolograms.add(armorStand);
         }
 
     }
