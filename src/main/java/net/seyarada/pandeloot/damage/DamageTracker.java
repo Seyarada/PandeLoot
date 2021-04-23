@@ -1,5 +1,7 @@
 package net.seyarada.pandeloot.damage;
 
+import net.citizensnpcs.api.CitizensAPI;
+import net.seyarada.pandeloot.PandeLoot;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -13,7 +15,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class DamageTracker implements Listener {
 
@@ -28,6 +32,11 @@ public class DamageTracker implements Listener {
     public static Map<UUID, Player> lastHits = new HashMap<>();
 
     public static void addPlayerDamage(UUID mob, Player player, Double damage) {
+
+        if(PandeLoot.getInstance().getServer().getPluginManager().getPlugin("MythicMobs")!=null) {
+            if(CitizensAPI.getNPCRegistry().isNPC(player)) return;
+        }
+
 
         if( ((LivingEntity) Bukkit.getEntity(mob) ).getHealth() < damage ) {
             damage = ((LivingEntity) Bukkit.getEntity(mob)).getHealth();

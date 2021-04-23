@@ -1,14 +1,19 @@
 package net.seyarada.pandeloot.compatibility.mythicmobs;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
+import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
+import io.lumine.xikage.mythicmobs.adapters.AbstractPlayer;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicDropLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobSpawnEvent;
 import io.lumine.xikage.mythicmobs.drops.Drop;
+import io.lumine.xikage.mythicmobs.drops.DropMetadata;
+import io.lumine.xikage.mythicmobs.drops.DropTable;
 import io.lumine.xikage.mythicmobs.io.MythicConfig;
 import io.lumine.xikage.mythicmobs.items.MythicItem;
+import io.lumine.xikage.mythicmobs.mobs.ActiveMob;
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
@@ -22,10 +27,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class MythicMobsCompatibility implements Listener {
 
@@ -34,6 +36,33 @@ public class MythicMobsCompatibility implements Listener {
         if (mI.isPresent())
             return BukkitAdapter.adapt(mI.get().generateItemStack(1));
 
+        return null;
+    }
+
+    public static Map.Entry<Collection<Drop>, DropMetadata> getDropTableDrops(RewardLine i, Player player, DamageUtil damageUtil) {
+        DropTable dropTable;
+        Optional<DropTable> maybeTable = MythicMobs.inst().getDropManager().getDropTable(i.item);
+        if(maybeTable.isPresent()) {
+            dropTable = maybeTable.get();
+            DropMetadata dropMeta;
+            if(player==null&&damageUtil==null) {
+                dropMeta = null;
+            } else if (player==null) {
+                AbstractEntity entity = BukkitAdapter.adapt(damageUtil.entity);
+                ActiveMob caster = MythicMobs.inst().getMobManager().getMythicMobInstance(entity);
+                dropMeta = new DropMetadata(caster, null);
+            } else if(damageUtil==null) {
+                AbstractPlayer p = BukkitAdapter.adapt(player);
+                dropMeta = new DropMetadata(null, p);
+            } else {
+                AbstractPlayer p = BukkitAdapter.adapt(player);
+                AbstractEntity entity = BukkitAdapter.adapt(damageUtil.entity);
+                ActiveMob caster = MythicMobs.inst().getMobManager().getMythicMobInstance(entity);
+                dropMeta = new DropMetadata(caster, p);
+            }
+            Collection<Drop> drops = dropTable.generate(dropMeta).getDrops();
+            return new AbstractMap.SimpleImmutableEntry<>(drops, dropMeta);
+        }
         return null;
     }
 

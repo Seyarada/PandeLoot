@@ -7,7 +7,6 @@ import net.seyarada.pandeloot.items.LootTable;
 import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.rewards.RewardLine;
-import net.seyarada.pandeloot.rewards.RewardOptions;
 import net.seyarada.pandeloot.schedulers.HideEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public class DropItem extends RewardOptions {
+public class DropItem {
 
     public RewardLine reward;
     public Location location;
@@ -26,8 +25,15 @@ public class DropItem extends RewardOptions {
 
     public DamageUtil damageUtil;
 
+    public DropItem(RewardLine reward, DamageUtil damageUtil, Player player) {
+        this.reward = reward;
+        this.location = damageUtil.getLocation();
+        this.player = player;
+        this.damageUtil = damageUtil;
+        initDropItem();
+    }
+
     public DropItem(RewardLine reward, Location location, Player player) {
-        super(reward);
         this.reward = reward;
         this.location = location;
         this.player = player;
@@ -35,7 +41,6 @@ public class DropItem extends RewardOptions {
     }
 
     public DropItem(RewardLine reward, Location location) {
-        super(reward);
         this.reward = reward;
         this.location = location;
         initDropItem();
@@ -43,13 +48,9 @@ public class DropItem extends RewardOptions {
 
     private void initDropItem() {
 
-        if(getParent()!=null) {
-            reward = LootTable.setParentTable(reward, Config.getLootTableRaw(parent));
+        if(reward.parent!=null) {
+            reward = LootTable.setParentTable(reward, Config.getLootTableRaw(reward.parent));
         }
-
-        parseEffects();
-        parseItemData();
-        parseConditions();
 
         doDrop();
         new DropEffects(this);
@@ -57,7 +58,7 @@ public class DropItem extends RewardOptions {
 
     public void doDrop() {
 
-        ItemStack itemToDrop = reward.getItemStack();
+        ItemStack itemToDrop = reward.getItemStack(player);
 
         if(itemToDrop==null) {
             Errors.UnableToGenerateItemStack(reward);
@@ -67,11 +68,11 @@ public class DropItem extends RewardOptions {
         if(itemToDrop.getType()== Material.AIR) return;
 
         // Sets the amount
-        itemToDrop.setAmount(reward.getAmount());
+        itemToDrop.setAmount(reward.amount);
 
         if(player!=null) {
             // Gives the item directly to the player if "toInv" is set to true
-            if (toInv && player.getInventory().firstEmpty() >= 0) {
+            if (reward.toInv && player.getInventory().firstEmpty() >= 0) {
                 player.getInventory().addItem(itemToDrop);
                 return;
             }
@@ -110,9 +111,9 @@ public class DropItem extends RewardOptions {
             item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.root, player.getName()));
             new HideEntity(item, player);
         }
-        if(!stackable)
+        if(!reward.stackable)
             item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.preventStack, UUID.randomUUID().toString()));
-        if(preventpickup) {
+        if(reward.preventpickup) {
             item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.preventPickup, "true"));
         }
     }

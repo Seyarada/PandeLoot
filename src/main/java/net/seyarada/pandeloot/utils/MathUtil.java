@@ -1,6 +1,9 @@
 package net.seyarada.pandeloot.utils;
 
+import net.seyarada.pandeloot.Config;
 import org.bukkit.util.Vector;
+
+import java.util.Random;
 
 public class MathUtil {
 
@@ -117,6 +120,37 @@ public class MathUtil {
                 return x;
             }
         }.parse();
+    }
+
+    public static Vector getVelocity(double expoffset, double expheight) {
+        Random random = new Random();
+        return new Vector(
+                Math.cos(random.nextDouble() * Math.PI * 2.0D) * expoffset, expheight,
+                Math.sin(random.nextDouble() * Math.PI * 2.0D) * expoffset);
+    }
+
+    public static String getDurationAsTime(long time) {
+        int hours = (int) time / 3600;
+        int temp = (int) time - hours * 3600;
+        int mins = temp / 60;
+        temp = temp - mins * 60;
+        int secs = temp;
+        if(hours>0) {
+            String text = Config.getHoursText();
+            text = text.replace("%h%", String.valueOf(hours));
+            text = text.replace("%m%", String.valueOf(mins));
+            text = text.replace("%s%", String.valueOf(secs));
+            return text;
+        }
+        if(mins>0) {
+            String text = Config.getMinutesText();
+            text = text.replace("%m%", String.valueOf(mins));
+            text = text.replace("%s%", String.valueOf(secs));
+            return text;
+        }
+        String text = Config.getSecondsText();
+        text = text.replace("%s%", String.valueOf(secs));
+        return text;
     }
 
 }

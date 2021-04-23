@@ -11,7 +11,7 @@ public class ChatUtil {
         Player[] players = damageUtil.getPlayers();
         for(Player player : players) {
             for (String i : Config.getScoreMessage()) {
-                i = DropUtil.parsePlaceholders(i, player, damageUtil);
+                i = PlaceholderUtil.parse(i, damageUtil, player);
                 if (i != null)
                     player.sendMessage(ChatUtil.getCenteredMessage(i));
             }

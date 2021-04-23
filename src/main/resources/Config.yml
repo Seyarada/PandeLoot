@@ -2,6 +2,10 @@ Settings:
   RainbowFrequency: 3
   PlayArmWhenOpeningLootBag: true
   OnlyPlayArmIfBothEmpty: false
+  AbandonText: '&aAbandon Time:,&e%time%'
+  TimeFormatSeconds: '%s% seconds'
+  TimeFormatMinutes: '%m% minutes and %s% seconds'
+  TimeFormatHours: '%h% hours, %m% minutes and %s% seconds'
 
 Announcements:
   ScoreHologram:

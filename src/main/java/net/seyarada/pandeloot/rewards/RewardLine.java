@@ -1,8 +1,10 @@
 package net.seyarada.pandeloot.rewards;
 
 import net.seyarada.pandeloot.Config;
-import net.seyarada.pandeloot.compatibility.MMOItemsCompatibility;
+import net.seyarada.pandeloot.compatibility.DenizenCompatibility;
 import net.seyarada.pandeloot.compatibility.OraxenCompatibility;
+import net.seyarada.pandeloot.compatibility.mmoitems.MIGeneratorCompatibility;
+import net.seyarada.pandeloot.compatibility.mmoitems.MMOItemsCompatibility;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.items.LootBag;
@@ -14,141 +16,117 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
-public class RewardLine {
+public class RewardLine extends RewardOptions {
 
-    private String origin;
-    private String item;
-    private String line;
-    public int amount = 1;
-    public String chance = "1";
+    public final String reward;
 
-    private int start;
-    private int end;
-    private int colon;
+    public Map<String, String> specialOptions = new HashMap<>();
 
-    public ItemStack itemStack;
+    public DamageUtil damageUtil;
+    public Player player;
 
-    private boolean skip;
+    public RewardLine(String line) {
+        this.line = line;
+        this.reward = line;
 
-    public Map<String, Object> options = new HashMap<>();
-
-    public RewardLine(String string, boolean store) {
-        // This reward simply stores a line which is going to be executed by external plugins
-        if(store) {
-            line = string;
-            start = line.indexOf("{");
-            end = line.lastIndexOf("}");
-            colon = line.indexOf(":");
-            setData(line, colon, false);
-        }
+        setOriginAndItem();
     }
 
-    public RewardLine(String string) {
-        line = string;
-        start = line.indexOf("{");
-        end = line.lastIndexOf("}");
-        colon = line.indexOf(":");
-
-        // No brackets found, this assumes the format is the following:
-        // Rewards:
-        // - diamond_block || - minecraft:diamond_block
-        if(start == -1 && end == -1) {
-            setData(line, colon, true);
-        }
-
-        // Both brackets found
-        if(start != -1 && end != -1) {
-
-            setData(line, colon, true);
-
-            // Stores what's inside the brackets as options
-            //                 +1 so it doesn't includes the bracket
-            String j = line.substring(start+1, end);
-
-            // Splits the bracket contents into individual options
-            // glow=true;color=RED -> [glow=true], [color=RED]
-            for(String k : j.split(";")) {
-
-                // Splits again by = to get the option and the value of the option
-                // then stores as a map so it can be get without further cost
-                String[] l = k.split("=");
-                String key = l[0].toLowerCase();
-                String value = l[1];
-                options.put(key, value);
-            }
-        }
+    public void build() {
+        if(reward.contains(" "))
+            setOutsideOptions();
+        setInsideOptions(line);
     }
 
-    public void setData(String line, int colonLocation, boolean setValues) {
+    private void setOriginAndItem() {
+        int indexBracket = reward.indexOf("{");
+        int originIndicator = reward.indexOf(":");
+        String originAndItem;
 
-        if(start!=-1 && end!=-1) {
-            // If the line has brackets, remove them
-            // stone{color=RED} 5 0.2 -> stone 5 0.2
-            line = line.substring(0, start)+line.substring(end+1);
-        }
+        if(indexBracket>-1)
+            originAndItem = reward.substring(0, indexBracket);
+        else if(reward.contains(" ")) {
+            originAndItem = reward.substring(0, reward.indexOf(" "));
+        } else
+            originAndItem = reward;
 
-        String[] splitLine;
-        splitLine = line.split(" ");
-
-        if(colonLocation==-1) {     // - stone 5 0.2
+        if(originIndicator>-1) {
+            origin = originAndItem.substring(0, originIndicator);
+            item = originAndItem.substring(originIndicator+1);
+        } else {
             origin = "minecraft";
-            item = splitLine[0];
-        } else {                    // - minecraft:stone 5 0.2
-            origin = splitLine[0].split(":")[0];
-            item = splitLine[0].split(":")[1];
+            item = originAndItem;
+        }
+    }
+
+    private void setOutsideOptions() {
+        int indexBracket = reward.indexOf("}");
+        if(indexBracket+1 >= reward.length()) return;
+        String outOptions;
+
+        if(indexBracket>-1) {
+            outOptions = reward.substring(indexBracket + 2);
+        } else
+            outOptions = reward.substring(reward.indexOf(" ")+2);
+
+        for(String i : outOptions.split(" ")) {
+           if(i.trim().isEmpty()) continue;
+
+           if(i.startsWith("0.")) {
+               chance = parseOutsideOption(i); continue; }
+           if(i.contains("=") || i.contains(">") || i.contains("<")) {
+               damage = i; continue; }
+           if(i.startsWith("-")) {
+               String[] b = i.substring(1).split(":");
+
+               if(b.length==1) {
+                   specialOptions.put(b[0], "true");
+                   continue;
+               }
+
+               String key = b[0];
+               String value = b[1];
+               specialOptions.put(key, value);
+               continue;
+
+           }
+
+           amount = Integer.parseInt(parseOutsideOption(i));
+        }
+    }
+
+    private String parseOutsideOption(String i) {
+        if(i.contains("to")) {
+            String[] n = "to".split(i);
+            Random r = new Random();
+            double rangeMin = Double.parseDouble(n[0]);
+            double rangeMax = Double.parseDouble(n[1]);
+            return String.valueOf(rangeMin + (rangeMax - rangeMin) * r.nextDouble());
         }
 
-        if(item.contains(";"))
-            item = item.split(";")[0];
+        return i;
+    }
 
-        if(setValues && splitLine.length>1) { // More than one element found when splitting by " "
+    public void setInsideOptions(String str) {
+        Map<String, String> insideOptions = getOptions(str);
+        if(insideOptions==null) return;
 
-            amount = Integer.parseInt(splitLine[1]);
-            if(splitLine.length>2)
-                chance = splitLine[2];
-
+        for(String option : insideOptions.keySet()) {
+            String value = PlaceholderUtil.parse(insideOptions.get(option), damageUtil, player);
+            optionsSwitch(option, value);
         }
-
     }
 
-    public String getOption(String fallback, String... option) {
-        for(String i : option) {
-            i = i.toLowerCase();
-            if(options.containsKey(i)) {
-                return String.valueOf(options.get(i));
-            }
-        }
-        return fallback;
+    public static List<RewardLine> StringListToRewardList(List<String> strings) {
+        return strings.stream()
+                .map(RewardLine::new)
+                .collect(Collectors.toList());
     }
 
-    public void put(String key, String value) {
-        options.putIfAbsent(key.toLowerCase(), value);
-    }
-
-    public String getOrigin() {
-        return origin;
-    }
-
-    public String getItem() {
-        return item;
-    }
-
-    public double getChance(DamageUtil u, Player p) {
-        chance = PlaceholderUtil.parse(chance, u, p);
-        return PlaceholderUtil.parseMath(chance);
-    }
-
-    public boolean isShared() {
-        return Boolean.parseBoolean(getOption("false", "shared"));
-    }
-
-    public void setChance(String chance) {
-        this.chance = chance;
-    }
-
-    public ItemStack getItemStack() {
+    public ItemStack getItemStack(Player player) {
 
         if(itemStack!=null) {
             return itemStack;
@@ -165,48 +143,23 @@ public class RewardLine {
                 return MythicMobsCompatibility.getItem(item);
             case "mmoitems":
             case "mi":
-                return MMOItemsCompatibility.getItem(item, this);
+                return MMOItemsCompatibility.getItem(item, this, player);
+            case "mmoitemsgenerator":
+            case "migenerator":
+            case "migen":
+                return MIGeneratorCompatibility.getItem(item, this, player);
             case "oraxen":
                 return OraxenCompatibility.getItem(item);
+            case "denizenscript":
+            case "dscript":
+                new DenizenCompatibility().execute(item);
+                return new ItemStack(Material.AIR, 1);
+            case "denizenitem":
+            case "ditem":
+                return DenizenCompatibility.getItem(item);
+
         }
         return null;
     }
 
-    public int getAmount() {
-        return amount;
-    }
-
-    public String getLine() {
-        return line;
-    }
-
-    public void setSkip(boolean skip) {
-        this.skip = skip;
-    }
-
-    public void setOrigin(String newOrigin) { this.origin = newOrigin; }
-
-    public boolean getSkip() {
-        return skip;
-    }
-
-    public int getSkipAmount() { return Integer.parseInt(getOption("0", "skip")); }
-
-    public boolean shouldStop() { return Boolean.parseBoolean(getOption("false", "stop")); }
-
-    public boolean asLootTable() { return Boolean.parseBoolean(getOption("false", "asloottable", "aslt")); }
-
-    public int getDelay() {
-        return Integer.parseInt(getOption("0", "delay"));
-    }
-
-    public double getExplodeRadius() {
-        return Double.parseDouble(getOption(Config.getDefault("ExplodeRadius"), "exploderadius"));
-    }
-
-    public static List<RewardLine> StringListToRewardList(List<String> strings) {
-        return strings.stream()
-                .map(RewardLine::new)
-                .collect(Collectors.toList());
-    }
 }

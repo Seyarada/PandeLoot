@@ -1,27 +1,35 @@
 package net.seyarada.pandeloot.items;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.AbstractPlayer;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.drops.LootBag;
-import io.lumine.xikage.mythicmobs.drops.*;
-import io.lumine.xikage.mythicmobs.mobs.ActiveMob;
+import io.lumine.xikage.mythicmobs.drops.Drop;
+import io.lumine.xikage.mythicmobs.drops.DropMetadata;
+import io.lumine.xikage.mythicmobs.drops.IItemDrop;
 import net.seyarada.pandeloot.Config;
+import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.drops.DropConditions;
 import net.seyarada.pandeloot.rewards.RewardContainer;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 public class ItemUtils {
 
     public static void collectRewards(List<RewardLine> rewardsToCollect, List<RewardLine> store, int playerSize, DamageUtil damageUtil, Player player) {
         for(RewardLine i : rewardsToCollect) {
-            switch(i.getOrigin()) {
+
+            i.damageUtil = damageUtil;
+            i.player = player;
+            i.build();
+
+            switch(i.origin) {
                 case "loottable":
+
+                    if(DropConditions.validate(i, player, damageUtil)) break;
+
                     LootTable lootTable = LootTable.of(i);
                     lootTable.setDamageUtil(damageUtil);
                     lootTable.setPlayer(player);
@@ -30,55 +38,36 @@ public class ItemUtils {
                     break;
                 case "droptable":
 
-                    DropTable dropTable;
-                    Optional<DropTable> maybeTable = MythicMobs.inst().getDropManager().getDropTable(i.getItem());
-                    if(maybeTable.isPresent()) {
-                        dropTable = maybeTable.get();
+                    if(DropConditions.validate(i, player, damageUtil)) break;
 
-                        DropMetadata dropMeta;
-                        if(player==null&&damageUtil==null) {
-                            dropMeta = null;
-                        } else if (player==null) {
-                            AbstractEntity entity = BukkitAdapter.adapt(damageUtil.entity);
-                            ActiveMob caster = MythicMobs.inst().getMobManager().getMythicMobInstance(entity);
-                            dropMeta = new DropMetadata(caster, null);
-                        } else if(damageUtil==null) {
-                            AbstractPlayer p = BukkitAdapter.adapt(player);
-                            dropMeta = new DropMetadata(null, p);
-                        } else {
-                            AbstractPlayer p = BukkitAdapter.adapt(player);
-                            AbstractEntity entity = BukkitAdapter.adapt(damageUtil.entity);
-                            ActiveMob caster = MythicMobs.inst().getMobManager().getMythicMobInstance(entity);
-                            dropMeta = new DropMetadata(caster, p);
+                    Map.Entry<Collection<Drop>, DropMetadata> pair = MythicMobsCompatibility.getDropTableDrops(i, player, damageUtil);
+                    if(pair==null) break;
+
+                    for (Drop drop : pair.getKey()) {
+
+                        RewardLine reward = new RewardLine(drop.getLine());
+                        if (drop instanceof IItemDrop) {
+                            reward.itemStack = BukkitAdapter.adapt(((IItemDrop) drop).getDrop(pair.getValue()));
+                            reward.amount = reward.itemStack.getAmount();
+                            reward.setInsideOptions(i.line);
                         }
 
-                        LootBag loot = dropTable.generate(dropMeta);
-
-                        for (Drop drop : loot.getDrops()) {
-
-                            RewardLine reward = new RewardLine(drop.getLine(), true);
-                            if (drop instanceof IItemDrop) {
-                                reward.itemStack = BukkitAdapter.adapt(((IItemDrop) drop).getDrop(dropMeta));
-                                reward.amount = reward.itemStack.getAmount();
-                            }
-
-                            store.add(reward);
-                        }
+                        store.add(reward);
                     }
                     break;
                 case "lootbag":
-                    if(i.asLootTable()) {
-                        lootTable = new LootTable(Config.getLootBagRaw(i.getItem()), i);
+                    if(i.asloottable) {
+                        lootTable = new LootTable(Config.getLootBagRaw(i.item), i);
                         lootTable.setDamageUtil(damageUtil);
                         lootTable.setPlayer(player);
                         j = lootTable.getDrops();
                         collectRewards(j, store, playerSize, damageUtil, player);
                         break;
                     }
-                    else RewardContainer.setParentTable(i, Config.getLootBagRaw(i.getItem()));
+                    else RewardContainer.setParentTable(i, Config.getLootBagRaw(i.item));
                 default:
-                    if(i.isShared()) {
-                        i.setChance(String.valueOf(1d/playerSize));
+                    if(i.shared) {
+                        i.chance = String.valueOf(1d/playerSize);
                     }
                     store.add(i);
             }

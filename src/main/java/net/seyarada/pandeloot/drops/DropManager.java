@@ -17,9 +17,6 @@ public class DropManager {
     private DamageUtil damageUtil;
     private Location location;
 
-    private double randomLocX;
-    private double randomLocZ;
-
     public int delay;
 
     public DropManager(List<Player> players, List<RewardLine> rewards) {
@@ -67,16 +64,21 @@ public class DropManager {
                     continue;
                 }
 
-                if(advCounter.containsKey(j.getExplodeRadius())) {
-                    advCounter.put(j.getExplodeRadius(), advCounter.get(j.getExplodeRadius())+1);
+                // 3 Radius
+                if(advCounter.containsKey(j.explodeRadius)) {
+                    // 3,x+1
+                    advCounter.put(j.explodeRadius, advCounter.get(j.explodeRadius)+1);
                 } else {
-                    advCounter.put(j.getExplodeRadius(), 1);
+                    // 3,1
+                    advCounter.put(j.explodeRadius, 1);
                 }
 
-                j.options.put("RadialDrop", advCounter);
-                j.options.put("ThisItem", advCounter.get(j.getExplodeRadius())+1);
+                //j.options.put("RadialDrop", advCounter);
+                j.radialDrop = advCounter;
+                //j.options.put("ThisItem", advCounter.get(j.explodeRadius)+1);
+                j.radialOrder = advCounter.get(j.explodeRadius)+1;
 
-                playerDelay += j.getDelay();
+                playerDelay += j.delay;
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -84,12 +86,12 @@ public class DropManager {
                     }
                 }.runTaskLater(PandeLoot.getInstance(), playerDelay);
 
-                if(j.isShared())
+                if(j.shared)
                     rewards.remove(j);
-                if(j.shouldStop())
+                if(j.stop)
                     break;
 
-                skip = j.getSkipAmount();
+                skip = j.skip;
             }
 
             delay = playerDelay;
@@ -99,7 +101,7 @@ public class DropManager {
 
     private void dropAction(RewardLine j, Player i) {
         if(damageUtil!=null)
-            new DropItem(j, damageUtil.getLocation(), i);
+            new DropItem(j, damageUtil, i);
         else
             new DropItem(j, location, i);
     }

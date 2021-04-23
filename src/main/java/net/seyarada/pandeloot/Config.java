@@ -57,6 +57,27 @@ public class Config {
                 e.printStackTrace();
             }
         }
+
+        updateConfig();
+
+    }
+
+    public void updateConfig() {
+        InputStreamReader iSR = new InputStreamReader(PandeLoot.getInstance().getResource("Config.yml"));
+        FileConfiguration internalConfig = YamlConfiguration.loadConfiguration(iSR);
+
+        for(String i : internalConfig.getKeys(true)) {
+            if(!config.contains(i) && config.getStringList(i).size()==0) {
+                config.set(i, internalConfig.get(i));
+            }
+        }
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     public static void loadConfigFile() {
@@ -188,6 +209,22 @@ public class Config {
 
     public static String getDefault(String str) {
         return config.getString("DefaultValues."+str);
+    }
+
+    public static String getAbandonText() {
+        return config.getString("Settings.AbandonText");
+    }
+
+    public static String getSecondsText() {
+        return config.getString("Settings.TimeFormatSeconds");
+    }
+
+    public static String getMinutesText() {
+        return config.getString("Settings.TimeFormatMinutes");
+    }
+
+    public static String getHoursText() {
+        return config.getString("Settings.TimeFormatHours");
     }
 
 }

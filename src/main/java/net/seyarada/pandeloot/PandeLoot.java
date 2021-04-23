@@ -46,11 +46,13 @@ public class PandeLoot extends JavaPlugin {
     public void onDisable() {
         // Removes possible holograms that may be alive at the time of reload, so they don't get stuck
         // in a "frozen" state.
-        for(ArmorStand i : new LockedHologram(null,null,null).getArmorStands()) {
-            if(i!=null && i.isValid()) {
-                i.remove();
+        try {
+            for(ArmorStand i : LockedHologram.totalHolograms) {
+                if(i!=null && i.isValid()) {
+                    i.remove();
+                }
             }
-        }
+        } catch (Exception ignored) { }
     }
 
     private void setupEconomy() {

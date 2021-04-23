@@ -2,6 +2,7 @@ package net.seyarada.pandeloot.utils;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.seyarada.pandeloot.Boosts;
+import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -30,7 +31,8 @@ public class PlaceholderUtil {
 
         if(player!=null) {
 
-            PlaceholderAPI.setPlaceholders(player, i);
+            if(PandeLoot.getInstance().getServer().getPluginManager().getPlugin("PlaceholderAPI")!=null)
+                PlaceholderAPI.setPlaceholders(player, i);
 
             i = fastReplace(i, "%player%", player.getName());
             pendingBoost = Boosts.getPlayerBoost(player.getName());
@@ -81,7 +83,7 @@ public class PlaceholderUtil {
                 i = fastReplace(i, "%boost%", String.valueOf(globalBoost));
         }
 
-        if(i.contains("%math%")) {
+        if(i.contains("%math%") || i.contains("*") || i.contains("+") || i.contains("/")) {
             i = fastReplace(i, "%math%", "");
             i = String.valueOf(parseMath(i));
         }

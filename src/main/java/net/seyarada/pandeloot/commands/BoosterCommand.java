@@ -1,6 +1,7 @@
 package net.seyarada.pandeloot.commands;
 
 import net.seyarada.pandeloot.Boosts;
+import net.seyarada.pandeloot.utils.MathUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -42,12 +43,12 @@ public class BoosterCommand {
             if(globalTime<0)
                 CommandText.sendText("&7- &fGlobal boost: &aNot Active", sender);
             else
-                CommandText.sendText("&7- &fGlobal boost: &ax"+Boosts.getGlobalBoost()+", "+getDurationAsTime(globalTime), sender);
+                CommandText.sendText("&7- &fGlobal boost: &ax"+Boosts.getGlobalBoost()+", "+ MathUtil.getDurationAsTime(globalTime), sender);
 
             for(String i : Boosts.playerPower.keySet()) {
                 if(Boosts.getPlayerBoost(i)>1) {
                     long time = ( Boosts.playerDuration.get(i)-System.currentTimeMillis() )/1000;
-                    CommandText.sendText("&7- &f"+i+"'s boost: &ax"+Boosts.getPlayerBoost(i)+", "+getDurationAsTime(time), sender);
+                    CommandText.sendText("&7- &f"+i+"'s boost: &ax"+Boosts.getPlayerBoost(i)+", "+MathUtil.getDurationAsTime(time), sender);
                 }
             }
 
@@ -62,14 +63,5 @@ public class BoosterCommand {
             }
         }
         return true;
-    }
-
-    private static String getDurationAsTime(long time) {
-        int hours = (int) time / 3600;
-        int temp = (int) time - hours * 3600;
-        int mins = temp / 60;
-        temp = temp - mins * 60;
-        int secs = temp;
-        return hours+ " hours, "+mins+" minutes and "+secs+" seconds left";
     }
 }

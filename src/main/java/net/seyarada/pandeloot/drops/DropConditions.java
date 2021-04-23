@@ -1,10 +1,10 @@
 package net.seyarada.pandeloot.drops;
 
-import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DropConditions {
@@ -21,11 +21,18 @@ public class DropConditions {
     public static void runConditionsSimple(List<RewardLine> rewards) {
         // true -> false -> no pass aka no remove
         // false -> true -> pass if chance is too aka remove
-        rewards.removeIf(i -> !chance(i, null,null) && !i.getSkip());
+        rewards.removeIf(i -> !chance(i, null,null) && !i.skipConditions);
+    }
+
+    public static boolean validate(RewardLine reward, Player player, DamageUtil damageUtil) {
+        List<RewardLine> validateList = new ArrayList<>();
+        validateList.add(reward);
+        filter(validateList, player, damageUtil);
+        return validateList.size() == 0;
     }
 
     public static void runConditions(List<RewardLine> rewards, Player p, DamageUtil u) {
-        rewards.removeIf(i -> (!chance(i,p,u) || !damage(i,p,u) || !top(i,p,u) || !permission(i,p) || !lasthit(i,p,u)) && !i.getSkip());
+        rewards.removeIf(i -> (!chance(i,p,u) || !damage(i,p,u) || !top(i,p,u) || !permission(i,p) || !lasthit(i,p,u)) && !i.skipConditions);
     }
 
     public static boolean chance(RewardLine i, Player p, DamageUtil u) {
@@ -34,7 +41,7 @@ public class DropConditions {
     }
 
     public static boolean damage(RewardLine i, Player player, DamageUtil damageUtil) {
-        String requiredDamage = i.getOption(null, "damage");
+        String requiredDamage = i.damage;
         if(requiredDamage==null) return true;
 
         double totalHP = damageUtil.getTotalHP();
@@ -64,7 +71,8 @@ public class DropConditions {
     }
 
     public static boolean top(RewardLine i, Player player, DamageUtil damageUtil) {
-        String top = i.getOption("0", "top");
+        String top = i.top;
+        if(top==null) return true;
 
         if(top.contains("to")) {
             String[] values = top.split("to");
@@ -83,14 +91,14 @@ public class DropConditions {
     }
 
     public static boolean permission(RewardLine reward, Player player) {
-        String permission = reward.getOption(null, "permission");
+        String permission = reward.permission;
         if(permission==null) return true;
 
         return player.hasPermission(permission);
     }
 
     public static boolean lasthit(RewardLine rewardLine, Player player, DamageUtil damageUtil) {
-        boolean lastHit = Boolean.parseBoolean(rewardLine.getOption(Config.getDefault("LastHit"), "lasthit"));
+        boolean lastHit = rewardLine.lasthit;
         if(lastHit)
             return player == damageUtil.lastHit;
         return true;

@@ -15,7 +15,7 @@ public class LootTable extends RewardContainer {
     }
 
     public static LootTable of(RewardLine line) {
-        return new LootTable(Config.getLootTableRaw(line.getItem()), line);
+        return new LootTable(Config.getLootTableRaw(line.item), line);
     }
 
     public ConfigurationSection getLootTable() {

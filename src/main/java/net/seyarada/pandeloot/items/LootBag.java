@@ -2,13 +2,11 @@ package net.seyarada.pandeloot.items;
 
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
-import net.seyarada.pandeloot.drops.DropConditions;
 import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.rewards.RewardContainer;
 import net.seyarada.pandeloot.rewards.RewardLine;
-import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,12 +22,20 @@ import java.util.List;
 public class LootBag extends RewardContainer {
 
     private final ConfigurationSection lootBag;
-    private final RewardLine line;
+    private final RewardLine reward;
 
-    public LootBag(ConfigurationSection lootBag, RewardLine line) {
-        super(lootBag, line);
+    public LootBag(ConfigurationSection lootBag, RewardLine reward) {
+        super(lootBag, reward);
         this.lootBag = lootBag;
-        this.line = RewardContainer.setParentTable(line, lootBag);
+        this.reward = RewardContainer.setParentTable(reward, lootBag);
+
+        ConfigurationSection optionsSec = lootBag.getConfigurationSection("Options");
+        if(optionsSec!=null) {
+            for(String i : optionsSec.getKeys(false)) {
+                String value = lootBag.getString("Options." + i);
+                reward.optionsSwitch(i, value);
+            }
+        }
     }
 
     public void doGroundDrop(Player player, Item item) {
@@ -75,7 +81,7 @@ public class LootBag extends RewardContainer {
         meta.setCustomModelData(model);
         itemStack.setItemMeta(meta);
 
-        return NMSManager.addNBT(itemStack, NBTNames.bag, line.getItem());
+        return NMSManager.addNBT(itemStack, NBTNames.bag, reward.item);
 
     }
 

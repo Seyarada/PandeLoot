@@ -90,6 +90,8 @@ public class RewardsListener implements Listener {
 
             if(NMSManager.hasTag(iS, NBTNames.playOnPickup)) {
                 DropItem source = DropEffects.playOnPickupStorage.get(UUID.fromString(NMSManager.getTag(iS, NBTNames.playOnPickup)));
+                if(source.reward.playonpickup=true)
+                    source.player = player;
                 new DropEffects(source, true);
             }
 

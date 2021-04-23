@@ -5,7 +5,7 @@ import net.seyarada.pandeloot.rewards.RewardLine;
 public class Errors {
 
     public static void UnableToGenerateItemStack(RewardLine reward) {
-        System.err.println("[PandeLoot] Couldn't create the item -"+reward.getItem()+"- from origin "+reward.getOrigin());
+        System.err.println("[PandeLoot] Couldn't create the item -"+reward.item+"- from origin "+reward.origin);
     }
 
     public static void UnableToFindLootTable(String lootTable) {
@@ -16,4 +16,7 @@ public class Errors {
         System.err.println("[PandeLoot] Couldn't find the LootBag -"+lootBag+"- !");
     }
 
+    public static void unableToFindOption(String option) {
+        System.err.println("[PandeLoot] Can't find the option -"+option+"- !");
+    }
 }

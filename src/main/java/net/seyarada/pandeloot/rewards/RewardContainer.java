@@ -34,14 +34,14 @@ public class RewardContainer {
         this.line = line;
 
         if(rewardContainer==null) {
-            if(line.getOrigin().equals("lootbag"))
-                Errors.UnableToFindLootBag(line.getItem());
-            else if(line.getOrigin().equals("loottable"))
-                Errors.UnableToFindLootTable(line.getItem());
+            if(line.origin.equals("lootbag"))
+                Errors.UnableToFindLootBag(line.item);
+            else if(line.origin.equals("loottable"))
+                Errors.UnableToFindLootTable(line.item);
             return;
         }
 
-        setLootTableOriginOptions();
+        //setLootTableOriginOptions();
         initDropTable();
     }
 
@@ -85,9 +85,9 @@ public class RewardContainer {
                 RewardLine item = doRoll(items);                             // by item until it reaches the desired
                 List<String> lS = new ArrayList<>();
                 for(RewardLine m : drops) {
-                    lS.add(m.getLine());
+                    lS.add(m.line);
                 }
-                if(item!=null&&!lS.contains(item.getLine()))
+                if(item!=null&&!lS.contains(item.line))
                     drops.add(item);
             }
         } else {
@@ -127,7 +127,7 @@ public class RewardContainer {
         items.remove(idx); // Makes sure there isn't any repeated
 
         RewardLine item = rollItems[idx];
-        item.setSkip(true);
+        item.skipConditions = true;
         return item;
     }
 
@@ -148,7 +148,7 @@ public class RewardContainer {
         DropConditions.filter(rewards, player, damageUtil);
 
         for (RewardLine item : rewards) {
-            item.setChance("1");
+            item.chance = "1";
             setParentTable(item, rewardContainer);
             drops.add(item);
         }
@@ -162,39 +162,29 @@ public class RewardContainer {
         DropConditions.runConditionsSimple(rewards);
 
         for (RewardLine item : rewards) {
-            item.setChance("1");
+            item.chance = "1";
             setParentTable(item, rewardContainer);
             drops.add(item);
         }
         return drops;
     }
 
-    // This adds the LootTable options to the lineConfig.
+    // This adds the RewardContainer options to the lineConfig.
     // Note: This won't override existing options
     public static RewardLine setParentTable(RewardLine lineConfig, ConfigurationSection rewardContainer) {
 
         if(rewardContainer==null) {
-            Errors.UnableToFindLootTable(lineConfig.getOption(null, "parent"));
+            Errors.UnableToFindLootTable(lineConfig.parent);
             return lineConfig;
         }
 
         for (String key : rewardContainer.getKeys(false)) {
+            if(key.equalsIgnoreCase("rewards")) continue;
+
             String value = rewardContainer.getString(key);
-            lineConfig.put(key, value);
+            lineConfig.optionsSwitch(key, value);
         }
         return lineConfig;
-    }
-
-    private void setLootTableOriginOptions() {
-        // TODO: Improve this
-        for (String key : line.options.keySet()) {
-            if(bannedInherit.contains(key)) continue;
-
-            String value = String.valueOf(line.options.get(key));
-            if(!rewardContainer.contains(key)) {
-                rewardContainer.set(key, value);
-            }
-        }
     }
 
     public void setPlayer(Player player) {

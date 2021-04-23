@@ -6,11 +6,13 @@ import net.milkbowl.vault.economy.Economy;
 import net.mystipvp.holobroadcast.holograms.HologramPlayer;
 import net.mystipvp.holobroadcast.holograms.HologramPlayersManager;
 import net.seyarada.pandeloot.PandeLoot;
+import net.seyarada.pandeloot.compatibility.DiscordSRVCompatibility;
+import net.seyarada.pandeloot.compatibility.MMOCoreCompatibility;
 import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.rewards.NBTNames;
+import net.seyarada.pandeloot.rewards.RewardLine;
 import net.seyarada.pandeloot.schedulers.LockedHologram;
 import net.seyarada.pandeloot.utils.ColorUtil;
-import net.seyarada.pandeloot.utils.DropUtil;
 import net.seyarada.pandeloot.utils.MathUtil;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Bukkit;
@@ -24,12 +26,18 @@ public class DropEffects {
 
     private final DropItem src;
     private final Item item;
-
+    private final RewardLine reward;
     public static Map<UUID, DropItem> playOnPickupStorage = new HashMap<>();
+
+    private boolean isAbandoned;
+    public static Map<UUID, DropItem> storeForAbandon = new HashMap<>();
 
     public DropEffects(DropItem source) {
         this.src = source;
         this.item = source.item;
+        this.reward = src.reward;
+
+        storeForAbandon.put(item.getUniqueId(), source);
 
         if(runItemEffects()) {
             runPlayerEffects();
@@ -40,8 +48,24 @@ public class DropEffects {
     public DropEffects(DropItem source, boolean noExecuteItemEffects) {
         this.src = source;
         this.item = source.item;
+        this.reward = src.reward;
 
         if(noExecuteItemEffects) {
+            runPlayerEffects();
+            runGeneralEffects();
+        }
+    }
+
+    public DropEffects(UUID uuid, Item item) {
+        this.src = storeForAbandon.get(uuid);
+        this.item = item;
+        this.reward = src.reward;
+
+        storeForAbandon.remove(uuid);
+        isAbandoned = true;
+        reward.abandonTime = 0;
+
+        if(runItemEffects()) {
             runPlayerEffects();
             runGeneralEffects();
         }
@@ -50,23 +74,92 @@ public class DropEffects {
     private boolean runItemEffects() {
         if(item==null) return true;
 
-        if(src.hologram!=null && !src.hologram.isEmpty()) {
+        if(reward.abandonTime>0||isAbandoned) reward.playonpickup=true;
 
-            if(src.hologram.equalsIgnoreCase("display")) {
+        hologramEffect();
+        explodeEffect();
+
+        if (reward.glow) {
+            item.setGlowing(true);
+            ColorUtil.setColorEffects(item, reward.color, src.player, src.location, reward.beam);
+        }
+
+        if (reward.playonpickup) {
+            UUID uuid = UUID.randomUUID();
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.playOnPickup, uuid.toString()));
+            playOnPickupStorage.put(uuid, src);
+            reward.playonpickup = false;
+            return false;
+        }
+
+        return true;
+    }
+
+    private void runPlayerEffects() {
+        if(src.player==null) return;
+
+        if (reward.message!=null && !reward.message.isEmpty()) {
+            src.player.sendMessage(reward.message);
+        }
+
+        if ( (reward.title!=null && !reward.title.isEmpty()) || (reward.subtitle!=null && !reward.subtitle.isEmpty()) ) {
+            src.player.sendTitle(reward.title, reward.subtitle, reward.titleFade, reward.titleDuration, reward.titleFade);
+        }
+
+        if (reward.sound!=null && !reward.sound.isEmpty()) {
+            src.player.playSound(src.player.getLocation(), reward.sound, 1, 1);
+        }
+
+        if (reward.actionbar!=null && !reward.actionbar.isEmpty()) {
+            src.player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(reward.actionbar));
+        }
+
+        if(reward.money>0 && Bukkit.getServer().getPluginManager().getPlugin("Vault") != null) {
+            Economy economy = PandeLoot.getEconomy();
+            economy.depositPlayer(src.player, reward.money);
+        }
+
+        if (reward.experience > 0)
+            src.player.giveExp(reward.experience);
+
+        if (reward.holoBroadcast != null && Bukkit.getServer().getPluginManager().getPlugin("HoloBroadcast") != null) {
+            HologramPlayersManager manager = HologramPlayersManager.getInstance();
+            HologramPlayer holoPlayer = manager.getHologramPlayerFromUUID(src.player.getUniqueId());
+            holoPlayer.showHUD(reward.holoBroadcast, -1);
+        }
+
+        if(reward.mmocoreExp > 0)
+            MMOCoreCompatibility.exp(src.player, reward.mmocoreExp);
+    }
+
+    private void runGeneralEffects() {
+        if (reward.broadcast!=null && !reward.broadcast.isEmpty()) {
+            Bukkit.broadcastMessage(reward.broadcast);
+        }
+        if (reward.command!=null && !reward.command.isEmpty()) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.command);
+        }
+        DiscordSRVCompatibility.embed(src.player, src.damageUtil, reward.dTitle, reward.dMessage, reward.dChannel, reward.dColor, reward.dLink, reward.dAvatar);
+    }
+
+
+    private void hologramEffect() {
+        if( reward.hologram!=null && !reward.hologram.isEmpty()) {
+            if(reward.hologram.equalsIgnoreCase("display")) {
                 String text = PlaceholderUtil.parse(item.getItemStack().getItemMeta().getDisplayName(), src.damageUtil, src.player);
-                new LockedHologram(item, Collections.singletonList(text), src.player);
+                new LockedHologram(item, Collections.singletonList(text), src.player, reward.abandonTime, isAbandoned);
             }
-            else if(src.hologram.equalsIgnoreCase("lore")) {
+            else if(reward.hologram.equalsIgnoreCase("lore")) {
                 List<String> lore = item.getItemStack().getItemMeta().getLore();
                 if(lore!=null && !lore.isEmpty()) {
                     List<String> newLore = new ArrayList<>();
                     for(String i : lore) {
                         newLore.add(PlaceholderUtil.parse(i, src.damageUtil, src.player));
                     }
-                    new LockedHologram(item, newLore, src.player);
+                    new LockedHologram(item, newLore, src.player, reward.abandonTime, isAbandoned);
                 }
             }
-            else if(src.hologram.equalsIgnoreCase("full")) {
+            else if(reward.hologram.equalsIgnoreCase("full")) {
                 List<String> lore = item.getItemStack().getItemMeta().getLore();
                 String name = PlaceholderUtil.parse(item.getItemStack().getItemMeta().getDisplayName(), src.damageUtil, src.player);
                 List<String> newLore = new ArrayList<>();
@@ -77,15 +170,17 @@ public class DropEffects {
                         newLore.add(PlaceholderUtil.parse(i, src.damageUtil, src.player));
                     }
                 }
-                new LockedHologram(item, newLore, src.player);
+                new LockedHologram(item, newLore, src.player, reward.abandonTime, isAbandoned);
             } else {
-                new LockedHologram(item, Arrays.asList(src.hologram.split(",")), src.player);
+                new LockedHologram(item, Arrays.asList(reward.hologram.split(",")), src.player, reward.abandonTime, isAbandoned);
             }
-        }
-        //new LockedHologram(item, new String[]{"Volvo", "BMW", "Ford", "", "Mazda", "PandeLoot is Cool!"}, src.player);
+        } else if (reward.abandonTime>0)
+            new LockedHologram(item, new ArrayList<>(), src.player, reward.abandonTime, isAbandoned);
+    }
 
-        if (src.explode) {
-            switch (src.explodeType.toLowerCase()) {
+    private void explodeEffect() {
+        if (reward.explode && !isAbandoned) {
+            switch (reward.explodeType.toLowerCase()) {
                 default:
                 case "spread":
                     doSpreadDrop();
@@ -95,96 +190,28 @@ public class DropEffects {
                     break;
             }
         }
-
-        if (src.glow) {
-            item.setGlowing(true);
-            ColorUtil.setColorEffects(item, src.color, src.player, src.location, src.beam);
-        }
-
-        if (src.playonpickup) {
-            UUID uuid = UUID.randomUUID();
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.playOnPickup, uuid.toString()));
-            playOnPickupStorage.put(uuid, src);
-            src.playonpickup = false;
-            return false;
-        }
-
-        return true;
-    }
-
-    private void runPlayerEffects() {
-        if(src.player==null) return;
-
-        if (src.message!=null && !src.message.isEmpty()) {
-            src.message = PlaceholderUtil.parse(src.message, src.damageUtil, src.player);
-            src.player.sendMessage(src.message);
-        }
-
-        if ( (src.title!=null && !src.title.isEmpty()) || (src.subtitle!=null && !src.subtitle.isEmpty()) ) {
-            src.title = PlaceholderUtil.parse(src.title, src.damageUtil, src.player);
-            src.subtitle = PlaceholderUtil.parse(src.subtitle, src.damageUtil, src.player);
-            src.player.sendTitle(src.title, src.subtitle, src.titleFade, src.titleDuration, src.titleFade);
-        }
-
-        if (src.sound!=null && !src.sound.isEmpty()) {
-            src.sound = PlaceholderUtil.parse(src.sound, src.damageUtil, src.player);
-            src.player.playSound(src.player.getLocation(), src.sound, 1, 1);
-        }
-
-        if (src.actionbar!=null && !src.actionbar.isEmpty()) {
-            src.actionbar = PlaceholderUtil.parse(src.actionbar, src.damageUtil, src.player);
-            src.player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(src.actionbar));
-        }
-
-        if(src.money>0 && Bukkit.getServer().getPluginManager().getPlugin("Vault") != null) {
-            Economy economy = PandeLoot.getEconomy();
-            economy.depositPlayer(src.player, src.money);
-        }
-
-        if (src.experience > 0)
-            src.player.giveExp(src.experience);
-
-        if (src.holoBroadcast != null && Bukkit.getServer().getPluginManager().getPlugin("HoloBroadcast") != null) {
-            HologramPlayersManager manager = HologramPlayersManager.getInstance();
-            HologramPlayer holoPlayer = manager.getHologramPlayerFromUUID(src.player.getUniqueId());
-            holoPlayer.showHUD(src.holoBroadcast, -1);
-        }
-    }
-
-    private void runGeneralEffects() {
-        if (src.broadcast!=null && !src.broadcast.isEmpty()) {
-            src.broadcast = PlaceholderUtil.parse(src.broadcast, src.damageUtil, src.player);
-            Bukkit.broadcastMessage(src.broadcast);
-        }
-        if (src.command!=null && !src.command.isEmpty()) {
-            src.command = PlaceholderUtil.parse(src.command, src.damageUtil, src.player);
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), src.command);
-        }
-        DropUtil.sendDiscordEmbed(src.player, src.damageUtil, src.dTitle, src.dMessage, src.dChannel, src.dColor, src.dLink, src.dAvatar);
     }
 
     private void doSpreadDrop() {
-        Vector velocity = DropUtil.getVelocity(src.expoffset, src.expheight);
+        Vector velocity = MathUtil.getVelocity(reward.expoffset, reward.expheight);
         item.setVelocity(velocity);
     }
 
     private void doRadialDrop() {
-        Map<Double, Integer> advCounter = (Map<Double, Integer>) src.reward.options.get("RadialDrop");
 
-        int n = advCounter.get(src.explodeRadius);
-        int x = (int) src.reward.options.get("ThisItem");
+        int n = reward.radialDrop.get(reward.explodeRadius);
+        int x = reward.radialOrder;
 
         if(n==1) {
-            Random r = new Random();
-            n = r.nextInt(99) + 1;
-            x = r.nextInt(99) + 1;
+            doSpreadDrop();
+            return;
         }
 
         double angle = 2 * Math.PI / n;
         double cos = Math.cos(angle * x);
         double sin = Math.sin(angle * x);
-        double iX = item.getLocation().getX() + src.explodeRadius * cos;
-        double iZ = item.getLocation().getZ() + src.explodeRadius * sin;
+        double iX = item.getLocation().getX() + reward.explodeRadius * cos;
+        double iZ = item.getLocation().getZ() + reward.explodeRadius * sin;
 
         Location loc = item.getLocation().clone();
         loc.setX(iX);

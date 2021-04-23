@@ -6,7 +6,7 @@
 
     <groupId>net.seyarada</groupId>
     <artifactId>PandeLoot</artifactId>
-    <version>0.1.5</version>
+    <version>0.1.6</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -51,6 +51,11 @@
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
 
+        <!-- Citizens -->
+        <repository>
+            <id>everything</id>
+            <url>http://repo.citizensnpcs.co/</url>
+        </repository>
 
     </repositories>
 
@@ -96,6 +101,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- MMOCore -->
+        <dependency>
+            <groupId>net.Indyuce</groupId>
+            <artifactId>MMOCore</artifactId>
+            <version>1.7.1</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- DiscordSRV -->
         <dependency>
             <groupId>com.discordsrv</groupId>
@@ -125,6 +138,23 @@
             <groupId>com.github.RomainStorai</groupId>
             <artifactId>HolobroadcastAPI</artifactId>
             <version>v1.10.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Citizens -->
+        <dependency>
+            <groupId>net.citizensnpcs</groupId>
+            <artifactId>citizensapi</artifactId>
+            <version>2.0.27-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Denizen -->
+        <dependency>
+            <groupId>com.denizenscript</groupId>
+            <artifactId>denizencore</artifactId>
+            <version>1.90-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- NMS -->
