@@ -33,13 +33,9 @@ public class DamageTracker implements Listener {
     public static Map<UUID, Player> lastHits = new HashMap<>();
 
     public static void addPlayerDamage(UUID mob, Player player, Double damage) {
-
-        System.err.println(Arrays.toString(PandeLoot.getInstance().getServer().getPluginManager().getPlugins()));
-
         if(PandeLoot.getInstance().getServer().getPluginManager().getPlugin("Citizens")!=null) {
             if(CitizensAPI.getNPCRegistry().isNPC(player)) return;
         }
-
 
         if( ((LivingEntity) Bukkit.getEntity(mob) ).getHealth() < damage ) {
             damage = ((LivingEntity) Bukkit.getEntity(mob)).getHealth();
