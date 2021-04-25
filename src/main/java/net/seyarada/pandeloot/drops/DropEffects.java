@@ -6,10 +6,10 @@ import net.milkbowl.vault.economy.Economy;
 import net.mystipvp.holobroadcast.holograms.HologramPlayer;
 import net.mystipvp.holobroadcast.holograms.HologramPlayersManager;
 import net.seyarada.pandeloot.PandeLoot;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.compatibility.DiscordSRVCompatibility;
 import net.seyarada.pandeloot.compatibility.MMOCoreCompatibility;
 import net.seyarada.pandeloot.nms.NMSManager;
-import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import net.seyarada.pandeloot.schedulers.LockedHologram;
 import net.seyarada.pandeloot.utils.ColorUtil;
@@ -36,6 +36,12 @@ public class DropEffects {
         this.src = source;
         this.item = source.item;
         this.reward = src.reward;
+
+        if(item==null) {
+            runPlayerEffects();
+            runGeneralEffects();
+            return;
+        }
 
         storeForAbandon.put(item.getUniqueId(), source);
 
@@ -86,7 +92,7 @@ public class DropEffects {
 
         if (reward.playonpickup) {
             UUID uuid = UUID.randomUUID();
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.playOnPickup, uuid.toString()));
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), StringLib.playOnPickup, uuid.toString()));
             playOnPickupStorage.put(uuid, src);
             reward.playonpickup = false;
             return false;

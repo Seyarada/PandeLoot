@@ -1,13 +1,12 @@
 package net.seyarada.pandeloot.rewards;
 
-import net.seyarada.pandeloot.Errors;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.drops.DropConditions;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -26,18 +25,15 @@ public class RewardContainer {
     private Player player;
     private DamageUtil damageUtil;
 
-    // This is awful, I know
-    public static List<String> bannedInherit = Arrays.asList("stop", "broadcast", "command", "delay", "message", "title", "subtitle", "actionbar", "rewards");
-
     public RewardContainer(ConfigurationSection rewardContainer, RewardLine line) {
         this.rewardContainer = rewardContainer;
         this.line = line;
 
         if(rewardContainer==null) {
             if(line.origin.equals("lootbag"))
-                Errors.UnableToFindLootBag(line.item);
+                StringLib.badLootBag(line.item);
             else if(line.origin.equals("loottable"))
-                Errors.UnableToFindLootTable(line.item);
+                StringLib.badLootTable(line.item);
             return;
         }
 
@@ -174,7 +170,7 @@ public class RewardContainer {
     public static RewardLine setParentTable(RewardLine lineConfig, ConfigurationSection rewardContainer) {
 
         if(rewardContainer==null) {
-            Errors.UnableToFindLootTable(lineConfig.parent);
+            StringLib.badLootTable(lineConfig.parent);
             return lineConfig;
         }
 

@@ -6,7 +6,7 @@
 
     <groupId>net.seyarada</groupId>
     <artifactId>PandeLoot</artifactId>
-    <version>0.1.6b</version>
+    <version>0.1.6c</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

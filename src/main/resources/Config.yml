@@ -38,7 +38,10 @@ DefaultValues:
   Parent: null
   ExplodeType: Spread
   Hologram: Display
+  Top: 0
+  Permission: null
   HoloBroadcast: null
+  Type: null
   Stackable: true
   Glow: true
   Explode: true
@@ -49,10 +52,15 @@ DefaultValues:
   TitleDuration: 20
   TitleFade: 20
   Delay: 0
+  AbandonTime: 0
+  Amount: 1
+  MMOCoreExp: 0
   ExpHeight: 0.6
   ExpOffset: 0.2
   Beam: 0.0
   ExplodeRadius: 3.0
+  Unidentified: 0.0
+  Damage: 0
   DTitle: null
   DMessage: null
   DChannel: null

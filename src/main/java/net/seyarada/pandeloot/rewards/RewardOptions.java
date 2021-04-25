@@ -1,7 +1,7 @@
 package net.seyarada.pandeloot.rewards;
 
 import net.seyarada.pandeloot.DefaultOptions;
-import net.seyarada.pandeloot.Errors;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.entity.Player;
@@ -256,10 +256,11 @@ public class RewardOptions {
             case "model":
             case "material":
             case "options":
+            case "display":
                 break;
 
             default:
-                Errors.unableToFindOption(option);
+                StringLib.badOption(option);
         }
     }
 

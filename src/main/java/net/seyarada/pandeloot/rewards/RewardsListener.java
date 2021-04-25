@@ -1,6 +1,7 @@
 package net.seyarada.pandeloot.rewards;
 
 import net.seyarada.pandeloot.Config;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.damage.MobOptions;
@@ -39,8 +40,8 @@ public class RewardsListener implements Listener {
         if(e.getHand().equals(EquipmentSlot.HAND)) {
 
             ItemStack iS = e.getPlayer().getInventory().getItemInMainHand();
-            if(NMSManager.hasTag(iS, NBTNames.bag)) {
-                String lootBag = NMSManager.getTag(iS, NBTNames.bag);
+            if(NMSManager.hasTag(iS, StringLib.bag)) {
+                String lootBag = NMSManager.getTag(iS, StringLib.bag);
                 Location fLoc = e.getPlayer().getLocation();
 
                 iS.setAmount(iS.getAmount()-1);
@@ -58,10 +59,10 @@ public class RewardsListener implements Listener {
             for(Entity i : loc.getWorld().getNearbyEntities(loc, 1.5, 1.5 ,1.5)) {
                 if(i instanceof Item) {
 
-                    if ( NMSManager.hasTag(((Item)i).getItemStack(), NBTNames.bag) ) {
-                        if(NMSManager.hasTag(((Item)i).getItemStack(), NBTNames.onUse)) continue;
+                    if ( NMSManager.hasTag(((Item)i).getItemStack(), StringLib.bag) ) {
+                        if(NMSManager.hasTag(((Item)i).getItemStack(), StringLib.onUse)) continue;
 
-                        String lootBag = NMSManager.getTag(((Item)i).getItemStack(), NBTNames.bag);
+                        String lootBag = NMSManager.getTag(((Item)i).getItemStack(), StringLib.bag);
                         LootBag LootBag = new LootBag(Config.getLootBagRaw(lootBag), new RewardLine(lootBag));
 
                         LootBag.doGroundDrop(e.getPlayer(), (Item)i);
@@ -78,28 +79,28 @@ public class RewardsListener implements Listener {
             Player player = (Player) e.getEntity();
             ItemStack iS = e.getItem().getItemStack();
 
-            if (NMSManager.hasTag(iS, NBTNames.preventPickup) || NMSManager.hasTag(iS, NBTNames.onUse)) {
+            if (NMSManager.hasTag(iS, StringLib.preventPickup) || NMSManager.hasTag(iS, StringLib.onUse)) {
                 e.setCancelled(true);
                 return;
             }
 
-            if(NMSManager.hasTag(iS, NBTNames.root) && !NMSManager.getTag(iS, NBTNames.root).equals(player.getName())) {
+            if(NMSManager.hasTag(iS, StringLib.root) && !NMSManager.getTag(iS, StringLib.root).equals(player.getName())) {
                 e.setCancelled(true);
                 return;
             }
 
-            if(NMSManager.hasTag(iS, NBTNames.playOnPickup)) {
-                DropItem source = DropEffects.playOnPickupStorage.get(UUID.fromString(NMSManager.getTag(iS, NBTNames.playOnPickup)));
+            if(NMSManager.hasTag(iS, StringLib.playOnPickup)) {
+                DropItem source = DropEffects.playOnPickupStorage.get(UUID.fromString(NMSManager.getTag(iS, StringLib.playOnPickup)));
                 if(source.reward.playonpickup=true)
                     source.player = player;
                 new DropEffects(source, true);
             }
 
-            iS = NMSManager.removeNBT(iS, NBTNames.playOnPickup);
+            iS = NMSManager.removeNBT(iS, StringLib.playOnPickup);
             e.getItem().setItemStack( iS );
-            iS = NMSManager.removeNBT(iS, NBTNames.preventStack);
+            iS = NMSManager.removeNBT(iS, StringLib.preventStack);
             e.getItem().setItemStack( iS );
-            iS = NMSManager.removeNBT(iS, NBTNames.root);
+            iS = NMSManager.removeNBT(iS, StringLib.root);
             e.getItem().setItemStack( iS );
         }
     }

@@ -1,6 +1,7 @@
 package net.seyarada.pandeloot.rewards;
 
 import net.seyarada.pandeloot.Config;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.compatibility.DenizenCompatibility;
 import net.seyarada.pandeloot.compatibility.OraxenCompatibility;
 import net.seyarada.pandeloot.compatibility.mmoitems.MIGeneratorCompatibility;
@@ -70,10 +71,12 @@ public class RewardLine extends RewardOptions {
         if(indexBracket>-1) {
             outOptions = reward.substring(indexBracket + 2);
         } else
-            outOptions = reward.substring(reward.indexOf(" ")+2);
+            outOptions = reward.substring(reward.indexOf(" ")+1);
 
         for(String i : outOptions.split(" ")) {
            if(i.trim().isEmpty()) continue;
+
+           i = i.replace("-", "to");
 
            if(i.startsWith("0.")) {
                chance = parseOutsideOption(i); continue; }
@@ -94,13 +97,15 @@ public class RewardLine extends RewardOptions {
 
            }
 
-           amount = Integer.parseInt(parseOutsideOption(i));
+           String thingLeft = parseOutsideOption(i);
+           if(!thingLeft.equals("1"))
+            amount = (int) Double.parseDouble(thingLeft);
         }
     }
 
     private String parseOutsideOption(String i) {
         if(i.contains("to")) {
-            String[] n = "to".split(i);
+            String[] n = i.split("to");
             Random r = new Random();
             double rangeMin = Double.parseDouble(n[0]);
             double rangeMax = Double.parseDouble(n[1]);
@@ -131,10 +136,15 @@ public class RewardLine extends RewardOptions {
         if(itemStack!=null) {
             return itemStack;
         }
-
         switch (origin) {
             case "minecraft":
-                Material material = Material.valueOf(item.toUpperCase());
+                Material material;
+                try {
+                    material = Material.valueOf(item.toUpperCase());
+                } catch (Exception e) {
+                    StringLib.badItem(item.toUpperCase());
+                    return new ItemStack(Material.AIR, 1);
+                }
                 return new ItemStack(material, 1);
             case "lootbag":
                 return new LootBag(Config.getLootBagRaw(item), this).getItemStack();
@@ -142,6 +152,8 @@ public class RewardLine extends RewardOptions {
             case "mm":
                 return MythicMobsCompatibility.getItem(item);
             case "mmoitems":
+            case "mmoitem":
+            case "mmoi":
             case "mi":
                 return MMOItemsCompatibility.getItem(item, this, player);
             case "mmoitemsgenerator":

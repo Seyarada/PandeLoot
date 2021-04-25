@@ -1,11 +1,10 @@
 package net.seyarada.pandeloot.drops;
 
 import net.seyarada.pandeloot.Config;
-import net.seyarada.pandeloot.Errors;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.items.LootTable;
 import net.seyarada.pandeloot.nms.NMSManager;
-import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import net.seyarada.pandeloot.schedulers.HideEntity;
 import org.bukkit.Location;
@@ -47,7 +46,6 @@ public class DropItem {
     }
 
     private void initDropItem() {
-
         if(reward.parent!=null) {
             reward = LootTable.setParentTable(reward, Config.getLootTableRaw(reward.parent));
         }
@@ -57,11 +55,10 @@ public class DropItem {
     }
 
     public void doDrop() {
-
         ItemStack itemToDrop = reward.getItemStack(player);
 
         if(itemToDrop==null) {
-            Errors.UnableToGenerateItemStack(reward);
+            StringLib.badItemStack(reward);
             return;
         }
 
@@ -108,13 +105,13 @@ public class DropItem {
         //}, 0, 1);
 
         if(player!=null) {
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.root, player.getName()));
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), StringLib.root, player.getName()));
             new HideEntity(item, player);
         }
         if(!reward.stackable)
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.preventStack, UUID.randomUUID().toString()));
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), StringLib.preventStack, UUID.randomUUID().toString()));
         if(reward.preventpickup) {
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.preventPickup, "true"));
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), StringLib.preventPickup, "true"));
         }
     }
     

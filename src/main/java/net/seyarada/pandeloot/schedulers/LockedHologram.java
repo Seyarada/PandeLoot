@@ -2,9 +2,9 @@ package net.seyarada.pandeloot.schedulers;
 
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.drops.DropEffects;
 import net.seyarada.pandeloot.nms.NMSManager;
-import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.utils.MathUtil;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Bukkit;
@@ -62,7 +62,7 @@ public class LockedHologram {
                 if(abandonTime==0 && aT>0) {
                     Location location = toTrack.getLocation();
                     ItemStack itemStack = ((Item) toTrack).getItemStack();
-                    itemStack = NMSManager.removeNBT(itemStack, NBTNames.root);
+                    itemStack = NMSManager.removeNBT(itemStack, StringLib.root);
                     UUID uuid = toTrack.getUniqueId();
 
                     toTrack.remove();

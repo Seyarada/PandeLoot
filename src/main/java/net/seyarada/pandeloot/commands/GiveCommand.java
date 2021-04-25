@@ -1,5 +1,6 @@
 package net.seyarada.pandeloot.commands;
 
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Bukkit;
@@ -20,6 +21,12 @@ public class GiveCommand {
     public static boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         Player player = Bukkit.getPlayer(args[1]);
+
+        if(player==null) {
+            StringLib.badPlayer(args[1], sender);
+            return false;
+        }
+
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < args.length-2; i++) {
             if (i > 0) sb.append(" ");

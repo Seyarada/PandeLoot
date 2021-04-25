@@ -2,9 +2,9 @@ package net.seyarada.pandeloot.items;
 
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.nms.NMSManager;
-import net.seyarada.pandeloot.rewards.NBTNames;
 import net.seyarada.pandeloot.rewards.RewardContainer;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Material;
@@ -28,6 +28,8 @@ public class LootBag extends RewardContainer {
         super(lootBag, reward);
         this.lootBag = lootBag;
         this.reward = RewardContainer.setParentTable(reward, lootBag);
+
+        if(lootBag==null) return;
 
         ConfigurationSection optionsSec = lootBag.getConfigurationSection("Options");
         if(optionsSec!=null) {
@@ -55,7 +57,7 @@ public class LootBag extends RewardContainer {
         item.getWorld().spawnParticle(Particle.SMOKE_LARGE, item.getLocation(), 5 ,0,0.15,0, 0.1);
 
         if(delay>0)
-            item.setItemStack(NMSManager.addNBT(item.getItemStack(), NBTNames.onUse, "true"));
+            item.setItemStack(NMSManager.addNBT(item.getItemStack(), StringLib.onUse, "true"));
 
         new BukkitRunnable() {
             @Override
@@ -65,12 +67,14 @@ public class LootBag extends RewardContainer {
                     item.remove();
                     return;
                 }
-                item.setItemStack(NMSManager.removeNBT(item.getItemStack(), NBTNames.onUse));
+                item.setItemStack(NMSManager.removeNBT(item.getItemStack(), StringLib.onUse));
             }
         }.runTaskLater(PandeLoot.getInstance(), delay);
     }
 
     public ItemStack getItemStack() {
+        if(lootBag==null) return new ItemStack(Material.AIR, 1);
+
         final String display = lootBag.getString("Display");
         final String material = lootBag.getString("Material");
         final int model = lootBag.getInt("Model");
@@ -81,7 +85,7 @@ public class LootBag extends RewardContainer {
         meta.setCustomModelData(model);
         itemStack.setItemMeta(meta);
 
-        return NMSManager.addNBT(itemStack, NBTNames.bag, reward.item);
+        return NMSManager.addNBT(itemStack, StringLib.bag, reward.item);
 
     }
 
