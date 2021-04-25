@@ -15,6 +15,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +34,9 @@ public class DamageTracker implements Listener {
 
     public static void addPlayerDamage(UUID mob, Player player, Double damage) {
 
-        if(PandeLoot.getInstance().getServer().getPluginManager().getPlugin("MythicMobs")!=null) {
+        System.err.println(Arrays.toString(PandeLoot.getInstance().getServer().getPluginManager().getPlugins()));
+
+        if(PandeLoot.getInstance().getServer().getPluginManager().getPlugin("Citizens")!=null) {
             if(CitizensAPI.getNPCRegistry().isNPC(player)) return;
         }
 
