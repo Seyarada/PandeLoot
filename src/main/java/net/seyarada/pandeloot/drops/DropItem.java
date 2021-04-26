@@ -13,6 +13,8 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 public class DropItem {
@@ -106,7 +108,12 @@ public class DropItem {
 
         if(player!=null) {
             item.setItemStack(NMSManager.addNBT(item.getItemStack(), StringLib.root, player.getName()));
-            new HideEntity(item, player);
+
+            if(reward.canView==null||reward.canView.equalsIgnoreCase("player")) {
+                new HideEntity(item, Collections.singletonList(player));
+            } else if(reward.canView.equalsIgnoreCase("fight")) {
+                new HideEntity(item, Arrays.asList(damageUtil.getPlayers()));
+            }
         }
         if(!reward.stackable)
             item.setItemStack(NMSManager.addNBT(item.getItemStack(), StringLib.preventStack, UUID.randomUUID().toString()));

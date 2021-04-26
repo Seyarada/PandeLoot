@@ -113,7 +113,7 @@ public class LockedHologram {
             }
 
             if(!isAbandoned)
-                new HideEntity(armorStand, player);
+                new HideEntity(armorStand, Collections.singletonList(player));
 
             holograms.add(armorStand);
             PandeLoot.totalHolograms.add(armorStand);

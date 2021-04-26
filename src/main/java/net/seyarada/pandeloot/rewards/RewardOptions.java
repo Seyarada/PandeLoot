@@ -34,6 +34,7 @@ public class RewardOptions {
     public String hologram = DefaultOptions.hologram;
     public String top = DefaultOptions.top;
     public String permission = DefaultOptions.permission;
+    public String canView =DefaultOptions.canView;
     public boolean glow = DefaultOptions.glow;
     public boolean explode = DefaultOptions.explode;
     public boolean stackable = DefaultOptions.stackable;
@@ -129,6 +130,9 @@ public class RewardOptions {
             case "permission":
                 if(DefaultOptions.permission!=null && !permission.equals(DefaultOptions.permission)) return;
                 permission = i; break;
+            case "canview":
+                if(DefaultOptions.canView!=null && !canView.equals(DefaultOptions.canView)) return;
+                canView = i; break;
             case "type":
                 if(DefaultOptions.type!=null && !type.equals(DefaultOptions.type)) return;
                 type = i; break;

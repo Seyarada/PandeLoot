@@ -35,6 +35,7 @@ public class DefaultOptions {
     public final static double beam = Config.config.getDouble("DefaultValues.Beam");
     public final static double explodeRadius = Config.config.getDouble("DefaultValues.ExplodeRadius");
     public final static String damage = Config.config.getString("DefaultValues.Damage");
+    public final static String canView = Config.config.getString("DefaultValues.CanView");
 
     public final static boolean stop = Config.config.getBoolean("DefaultValues.Stop");
     public final static boolean shared = Config.config.getBoolean("DefaultValues.Shared");

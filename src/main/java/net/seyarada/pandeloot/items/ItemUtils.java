@@ -49,6 +49,8 @@ public class ItemUtils {
                         if (drop instanceof IItemDrop) {
                             reward.itemStack = BukkitAdapter.adapt(((IItemDrop) drop).getDrop(pair.getValue()));
                             reward.amount = reward.itemStack.getAmount();
+                            reward.player = player;
+                            reward.damageUtil = damageUtil;
                             reward.build();
                             reward.setInsideOptions(i.line);
                             reward.chance = "1"; // MM already does the chance check on their side

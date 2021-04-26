@@ -7,6 +7,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
+
 public class HideEntity {
 
     private int id;
@@ -14,7 +16,7 @@ public class HideEntity {
 
     // This leaves a trail of particles of a specific color behind the item
 
-    public HideEntity(Entity toHide, Player player) {
+    public HideEntity(Entity toHide, List<Player> canView) {
 
         Plugin plugin = PandeLoot.getInstance();
 
@@ -22,7 +24,7 @@ public class HideEntity {
             if (toHide.isValid()) {
 
                 for (Entity entity : toHide.getNearbyEntities(36, 36, 36)) {
-                    if (entity instanceof Player && !entity.getName().equals(player.getName())) {
+                    if (entity instanceof Player && !canView.contains(entity)) {
                         NMSManager.destroyEntity(toHide.getEntityId(), entity);
                     }
                 }
