@@ -8,6 +8,8 @@ import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
 import io.lumine.xikage.mythicmobs.skills.ITargetedLocationSkill;
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import net.seyarada.pandeloot.damage.DamageTracker;
+import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Location;
@@ -35,7 +37,7 @@ public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocati
 
         RewardLine lineConfig = new RewardLine(i);
         Location location = BukkitAdapter.adapt(abstractLocation);
-        //new DropManager().doDrop(location, lineConfig);
+        new DropManager(location, Collections.singletonList(lineConfig)).initDrops();
         return false;
     }
 
@@ -49,10 +51,21 @@ public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocati
 
         RewardLine lineConfig = new RewardLine(i);
         Entity entity = BukkitAdapter.adapt(abstractEntity);
-        if(entity instanceof Player)
-            new DropManager((Player) entity, BukkitAdapter.adapt(skillMetadata.getCaster().getLocation()), Collections.singletonList(lineConfig)).initDrops();
-        //else
-        //    new DropManager().doDrop(entity.getLocation(), lineConfig);
+        if(entity instanceof Player) {
+            DropManager manager = new DropManager((Player) entity, BukkitAdapter.adapt(skillMetadata.getCaster().getLocation()), Collections.singletonList(lineConfig));
+            if(DamageTracker.loadedMobs.containsKey(skillMetadata.getCaster().getEntity().getUniqueId())) {
+                DamageUtil util = new DamageUtil(skillMetadata.getCaster().getEntity().getUniqueId());
+                manager.setDamageUtil(util);
+            }
+            manager.initDrops();
+        } else {
+            DropManager manager = new DropManager(entity.getLocation(), Collections.singletonList(lineConfig));
+            if(DamageTracker.loadedMobs.containsKey(skillMetadata.getCaster().getEntity().getUniqueId())) {
+                DamageUtil util = new DamageUtil(skillMetadata.getCaster().getEntity().getUniqueId());
+                manager.setDamageUtil(util);
+            }
+            manager.initDrops();
+        }
         return false;
     }
 }

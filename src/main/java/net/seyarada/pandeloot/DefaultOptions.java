@@ -14,6 +14,7 @@ public class DefaultOptions {
     public final static String hologram = Config.config.getString("DefaultValues.Hologram");
     public final static String top = Config.config.getString("DefaultValues.Top");
     public final static String permission = Config.config.getString("DefaultValues.Permission");
+    public final static String permissionBlacklist = Config.config.getString("DefaultValues.PermissionBlacklist");
     public final static String holoBroadcast = Config.config.getString("DefaultValues.HoloBroadcast");
     public final static String type = Config.config.getString("DefaultValues.Type");
     public final static String unidentified = Config.config.getString("DefaultValues.Unidentified");

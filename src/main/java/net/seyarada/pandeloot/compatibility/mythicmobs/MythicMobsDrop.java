@@ -8,6 +8,8 @@ import io.lumine.xikage.mythicmobs.drops.IMultiDrop;
 import io.lumine.xikage.mythicmobs.drops.LootBag;
 import io.lumine.xikage.mythicmobs.drops.droppables.ItemDrop;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
+import net.seyarada.pandeloot.damage.DamageTracker;
+import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.drops.DropManager;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Location;
@@ -37,9 +39,12 @@ public class MythicMobsDrop extends Drop implements IMultiDrop, Listener {
         RewardLine lineConfig = new RewardLine(i);
         Location location = BukkitAdapter.adapt(metadata.getDropper().get().getLocation());
         Player p = (Player) BukkitAdapter.adapt(metadata.getCause().get());
-        new DropManager(p, location, Collections.singletonList(lineConfig));
-
-        //TODO
+        DropManager manager = new DropManager(p, location, Collections.singletonList(lineConfig));
+        if(DamageTracker.loadedMobs.containsKey(metadata.getDropper().get().getEntity().getUniqueId())) {
+            DamageUtil util = new DamageUtil(metadata.getDropper().get().getEntity().getUniqueId());
+            manager.setDamageUtil(util);
+        }
+        manager.initDrops();
 
         // We don't want to drop anything with MythicMobs
         final LootBag loot = new LootBag(metadata);

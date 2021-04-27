@@ -34,6 +34,7 @@ public class RewardOptions {
     public String hologram = DefaultOptions.hologram;
     public String top = DefaultOptions.top;
     public String permission = DefaultOptions.permission;
+    public String permissionBlacklist = DefaultOptions.permissionBlacklist;
     public String canView =DefaultOptions.canView;
     public boolean glow = DefaultOptions.glow;
     public boolean explode = DefaultOptions.explode;
@@ -130,6 +131,11 @@ public class RewardOptions {
             case "permission":
                 if(DefaultOptions.permission!=null && !permission.equals(DefaultOptions.permission)) return;
                 permission = i; break;
+            case "permissionblacklist":
+            case "permissionbl":
+            case "pbl":
+                if(DefaultOptions.permissionBlacklist!=null && !permissionBlacklist.equals(DefaultOptions.permissionBlacklist)) return;
+                permissionBlacklist = i; break;
             case "canview":
                 if(DefaultOptions.canView!=null && !canView.equals(DefaultOptions.canView)) return;
                 canView = i; break;

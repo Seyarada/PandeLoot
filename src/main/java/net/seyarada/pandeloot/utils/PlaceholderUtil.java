@@ -19,13 +19,10 @@ public class PlaceholderUtil {
 
         if(i==null || i.isEmpty()) return i;
 
+        i = nukeMythicMobsPlaceholders(i);
+
         i = ChatColor.translateAlternateColorCodes('&', i);
         if(!i.contains("%")) return i;
-
-        i = fastReplace(i, "%nl%", "\n");       // This replaces MythicMobs string placeholders which are thrown in
-        i = fastReplace(i, "%co%", ":");        // forcefully when they create a ConfigLine, god knows why
-        i = fastReplace(i, "<pc>", "%");
-        i = fastReplace(i, "<§csp>", " ");
 
         int pendingBoost = 0;
 
@@ -83,7 +80,7 @@ public class PlaceholderUtil {
                 i = fastReplace(i, "%boost%", String.valueOf(globalBoost));
         }
 
-        if(i.contains("%math%") || i.contains("*") || i.contains("+") || i.contains("/")) {
+        if(i.contains("%math%") || i.contains("*") || i.contains("+")) {
             i = fastReplace(i, "%math%", "");
             i = String.valueOf(parseMath(i));
         }
@@ -93,6 +90,20 @@ public class PlaceholderUtil {
 
     public static double parseMath(String string) {
         return MathUtil.eval(string);
+    }
+
+    public static String nukeMythicMobsPlaceholders(String i) {
+        System.err.println(i);
+        i = fastReplace(i, "%nl%", "\n");       // This replaces MythicMobs string placeholders which are thrown in
+        i = fastReplace(i, "%co%", ":");        // forcefully when they create a ConfigLine, god knows why
+        i = fastReplace(i, "<&co>", ":");
+        i = fastReplace(i, "<&sq>", "'");
+        i = fastReplace(i, "<&da>", "-");
+        i = fastReplace(i, "<&sc>", ";");
+        i = fastReplace(i, "<pc>", "%");
+        i = fastReplace(i, "<sp>", " ");
+        i = fastReplace(i, "<§csp>", " ");
+        return i;
     }
 
     public static String fastReplace( String str, String target, String replacement ) {

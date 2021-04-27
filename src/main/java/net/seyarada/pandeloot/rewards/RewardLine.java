@@ -55,8 +55,13 @@ public class RewardLine extends RewardOptions {
             originAndItem = reward;
 
         if(originIndicator>-1) {
-            origin = originAndItem.substring(0, originIndicator);
-            item = originAndItem.substring(originIndicator+1);
+            if( (indexBracket>-1 && originIndicator<indexBracket ) || indexBracket==-1) {
+                origin = originAndItem.substring(0, originIndicator);
+                item = originAndItem.substring(originIndicator + 1);
+            } else {
+                origin = "minecraft";
+                item = originAndItem;
+            }
         } else {
             origin = "minecraft";
             item = originAndItem;
@@ -99,7 +104,7 @@ public class RewardLine extends RewardOptions {
 
            String thingLeft = parseOutsideOption(i);
            if(!thingLeft.equals("1"))
-            amount = (int) Double.parseDouble(thingLeft);
+               amount = (int) Double.parseDouble(thingLeft);
         }
     }
 
@@ -107,6 +112,8 @@ public class RewardLine extends RewardOptions {
         if(i.contains("to")) {
             String[] n = i.split("to");
             Random r = new Random();
+            if(n[0].isEmpty()||n[1].isEmpty()) return i;
+
             double rangeMin = Double.parseDouble(n[0]);
             double rangeMax = Double.parseDouble(n[1]);
             return String.valueOf(rangeMin + (rangeMax - rangeMin) * r.nextDouble());
