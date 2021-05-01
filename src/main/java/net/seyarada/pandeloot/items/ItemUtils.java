@@ -3,7 +3,9 @@ package net.seyarada.pandeloot.items;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.drops.Drop;
 import io.lumine.xikage.mythicmobs.drops.DropMetadata;
+import io.lumine.xikage.mythicmobs.drops.IIntangibleDrop;
 import io.lumine.xikage.mythicmobs.drops.IItemDrop;
+import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageUtil;
@@ -49,12 +51,16 @@ public class ItemUtils {
                         if (drop instanceof IItemDrop) {
                             reward.itemStack = BukkitAdapter.adapt(((IItemDrop) drop).getDrop(pair.getValue()));
                             reward.amount = reward.itemStack.getAmount();
-                            reward.player = player;
-                            reward.damageUtil = damageUtil;
-                            reward.build();
-                            reward.setInsideOptions(i.line);
-                            reward.chance = "1"; // MM already does the chance check on their side
+                        } else if(drop instanceof IIntangibleDrop) {
+                            reward.command = new MythicLineConfig(drop.getLine()).getString("c", "cmd");
+                            reward.origin = "minecraft";
+                            reward.item = "air";
                         }
+                        reward.player = player;
+                        reward.damageUtil = damageUtil;
+                        reward.build();
+                        reward.setInsideOptions(i.line);
+                        reward.chance = "1"; // MM already does the chance check on their side
 
                         store.add(reward);
                     }

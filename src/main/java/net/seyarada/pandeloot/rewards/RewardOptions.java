@@ -267,6 +267,8 @@ public class RewardOptions {
             case "material":
             case "options":
             case "display":
+            case "id":
+            case "c":
                 break;
 
             default:
