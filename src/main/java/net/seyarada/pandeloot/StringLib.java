@@ -30,6 +30,11 @@ public class StringLib {
         System.err.println(prefix+"Couldn't find the LootTable -"+lootTable+"- !");
     }
 
+    public static void badMIGen(String item) {
+        if(item==null) return;
+        System.err.println(prefix+"Couldn't use the MI Generator for the item -"+item+"- !");
+    }
+
     public static void badLootBag(String lootBag) {
         System.err.println(prefix+" Couldn't find the LootBag -"+lootBag+"- !");
     }

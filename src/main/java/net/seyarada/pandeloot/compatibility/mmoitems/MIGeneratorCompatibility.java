@@ -10,6 +10,7 @@ import net.Indyuce.mmoitems.api.item.template.explorer.TemplateExplorer;
 import net.Indyuce.mmoitems.api.item.template.explorer.TypeFilter;
 import net.Indyuce.mmoitems.api.player.PlayerData;
 import net.Indyuce.mmoitems.api.player.RPGPlayer;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.rewards.RewardLine;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
@@ -55,7 +56,10 @@ public class MIGeneratorCompatibility {
 
 
         Optional<MMOItemTemplate> optional = builder.rollLoot();
-
+        if(!optional.isPresent()) {
+            StringLib.badMIGen(item);
+            return new ItemStack(Material.AIR, 1);
+        }
         ItemStack iS = optional.get().newBuilder(itemLevel, itemTier).build().newBuilder().build();
         Validate.isTrue((iS != null && iS.getType() != Material.AIR), "Could not generate item with ID '" + optional.get().getId() + "'");
         return iS;

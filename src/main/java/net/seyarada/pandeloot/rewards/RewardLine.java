@@ -55,7 +55,8 @@ public class RewardLine extends RewardOptions {
             originAndItem = reward;
 
         if(originIndicator>-1) {
-            if( (indexBracket>-1 && originIndicator<indexBracket ) || indexBracket==-1) {
+            //   There's {       and : is before {                     There isn't {          Must be smaller than the line length
+            if( ( (indexBracket>-1 && originIndicator<indexBracket ) || indexBracket==-1 ) && originIndicator<originAndItem.length() ) {
                 origin = originAndItem.substring(0, originIndicator);
                 item = originAndItem.substring(originIndicator + 1);
             } else {
@@ -81,7 +82,8 @@ public class RewardLine extends RewardOptions {
         for(String i : outOptions.split(" ")) {
            if(i.trim().isEmpty()) continue;
 
-           i = i.replace("-", "to");
+           if(!i.split("-")[0].isEmpty())
+               i = i.replace("-", "to");
 
            if(i.startsWith("0.")) {
                chance = parseOutsideOption(i); continue; }

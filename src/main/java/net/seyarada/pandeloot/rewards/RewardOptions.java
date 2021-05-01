@@ -274,9 +274,15 @@ public class RewardOptions {
         }
     }
 
-    public double getChance(DamageUtil u, Player p) {
+    public double getChance(DamageUtil u, Player p, RewardLine i) {
         chance = PlaceholderUtil.parse(chance, u, p);
-        return PlaceholderUtil.parseMath(chance);
+        double newChance = PlaceholderUtil.parseMath(chance);
+        if(i.specialOptions.containsKey("multiplier")) {
+            double multiplier = Double.parseDouble(i.specialOptions.get("multiplier"));
+            double percent = u.getPercentageDamage(p);
+            newChance += percent*multiplier;
+        }
+        return newChance;
     }
 
     public static Map<String, String> getOptions(String i) {

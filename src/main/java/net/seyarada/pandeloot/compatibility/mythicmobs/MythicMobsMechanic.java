@@ -51,21 +51,21 @@ public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocati
 
         RewardLine lineConfig = new RewardLine(i);
         Entity entity = BukkitAdapter.adapt(abstractEntity);
+        DropManager manager;
         if(entity instanceof Player) {
-            DropManager manager = new DropManager((Player) entity, BukkitAdapter.adapt(skillMetadata.getCaster().getLocation()), Collections.singletonList(lineConfig));
+            manager = new DropManager((Player) entity, BukkitAdapter.adapt(skillMetadata.getCaster().getLocation()), Collections.singletonList(lineConfig));
             if(DamageTracker.loadedMobs.containsKey(skillMetadata.getCaster().getEntity().getUniqueId())) {
                 DamageUtil util = new DamageUtil(skillMetadata.getCaster().getEntity().getUniqueId());
                 manager.setDamageUtil(util);
             }
-            manager.initDrops();
         } else {
-            DropManager manager = new DropManager(entity.getLocation(), Collections.singletonList(lineConfig));
+            manager = new DropManager(entity.getLocation(), Collections.singletonList(lineConfig));
             if(DamageTracker.loadedMobs.containsKey(skillMetadata.getCaster().getEntity().getUniqueId())) {
                 DamageUtil util = new DamageUtil(skillMetadata.getCaster().getEntity().getUniqueId());
                 manager.setDamageUtil(util);
             }
-            manager.initDrops();
         }
+        manager.initDrops();
         return false;
     }
 }

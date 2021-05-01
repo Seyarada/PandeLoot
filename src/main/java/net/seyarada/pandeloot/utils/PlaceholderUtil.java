@@ -92,8 +92,8 @@ public class PlaceholderUtil {
         return MathUtil.eval(string);
     }
 
+
     public static String nukeMythicMobsPlaceholders(String i) {
-        System.err.println(i);
         i = fastReplace(i, "%nl%", "\n");       // This replaces MythicMobs string placeholders which are thrown in
         i = fastReplace(i, "%co%", ":");        // forcefully when they create a ConfigLine, god knows why
         i = fastReplace(i, "<&co>", ":");

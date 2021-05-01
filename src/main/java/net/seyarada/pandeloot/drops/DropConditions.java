@@ -21,7 +21,7 @@ public class DropConditions {
     public static void runConditionsSimple(List<RewardLine> rewards) {
         // true -> false -> no pass aka no remove
         // false -> true -> pass if chance is too aka remove
-        rewards.removeIf(i -> !chance(i, null,null) && !i.skipConditions);
+        rewards.removeIf(i -> chance(i, null, null) && !i.skipConditions);
     }
 
     public static boolean validate(RewardLine reward, Player player, DamageUtil damageUtil) {
@@ -32,12 +32,12 @@ public class DropConditions {
     }
 
     public static void runConditions(List<RewardLine> rewards, Player p, DamageUtil u) {
-        rewards.removeIf(i -> (!chance(i,p,u) || !damage(i,p,u) || !top(i,p,u) || !permission(i,p) || !permissionBL(i,p) || !lasthit(i,p,u)) && !i.skipConditions);
+        rewards.removeIf(i -> (chance(i, p, u) || !damage(i,p,u) || !top(i,p,u) || !permission(i,p) || !permissionBL(i,p) || !lasthit(i,p,u)) && !i.skipConditions);
     }
 
     public static boolean chance(RewardLine i, Player p, DamageUtil u) {
         double r = Math.random();
-        return r<=i.getChance(u,p);
+        return !(r <= i.getChance(u, p, i));
     }
 
     public static boolean damage(RewardLine i, Player player, DamageUtil damageUtil) {

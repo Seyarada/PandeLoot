@@ -109,13 +109,13 @@ public class RewardContainer {
         RewardLine[] rollItems = items.toArray(new RewardLine[0]);
         double totalWeight = 0.0;
         for (RewardLine i : items) {
-            totalWeight += i.getChance(damageUtil, player);
+            totalWeight += i.getChance(damageUtil, player, i);
         }
 
         // Now choose a random item.
         int idx = 0;
         for (double r = Math.random() * totalWeight; idx < rollItems.length - 1; ++idx) {
-            r -= rollItems[idx].getChance(damageUtil, player);
+            r -= rollItems[idx].getChance(damageUtil, player, rollItems[idx]);
             if (r <= 0.0) break;
         }
         amountDropped++;
@@ -176,6 +176,7 @@ public class RewardContainer {
 
         for (String key : rewardContainer.getKeys(false)) {
             if(key.equalsIgnoreCase("rewards")) continue;
+            if(lineConfig.line.toLowerCase().contains(key.toLowerCase())) continue;
 
             String value = rewardContainer.getString(key);
             lineConfig.optionsSwitch(key, value);

@@ -4,6 +4,7 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.seyarada.pandeloot.PandeLoot;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -15,7 +16,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -37,8 +37,9 @@ public class DamageTracker implements Listener {
             if(CitizensAPI.getNPCRegistry().isNPC(player)) return;
         }
 
-        if( ((LivingEntity) Bukkit.getEntity(mob) ).getHealth() < damage ) {
-            damage = ((LivingEntity) Bukkit.getEntity(mob)).getHealth();
+        Entity entity = Bukkit.getEntity(mob);
+        if( entity!=null && ((LivingEntity) entity ).getHealth() < damage ) {
+            damage = ((LivingEntity) entity).getHealth();
             lastHits.put(mob, player);
         }
 
