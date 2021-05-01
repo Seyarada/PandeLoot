@@ -96,13 +96,21 @@ public class PlaceholderUtil {
     public static String nukeMythicMobsPlaceholders(String i) {
         i = fastReplace(i, "%nl%", "\n");       // This replaces MythicMobs string placeholders which are thrown in
         i = fastReplace(i, "%co%", ":");        // forcefully when they create a ConfigLine, god knows why
+        i = fastReplace(i, "<pc>", "%");
         i = fastReplace(i, "<&co>", ":");
         i = fastReplace(i, "<&sq>", "'");
         i = fastReplace(i, "<&da>", "-");
+        i = fastReplace(i, "<&bs>", "\\");
+        i = fastReplace(i, "<&fs>", "/");
+        i = fastReplace(i, "<&sp>", " ");
+        i = fastReplace(i, "<&csp>", " ");
+        i = fastReplace(i, "<&cm>", ",");
         i = fastReplace(i, "<&sc>", ";");
-        i = fastReplace(i, "<pc>", "%");
-        i = fastReplace(i, "<sp>", " ");
-        i = fastReplace(i, "<§csp>", " ");
+        i = fastReplace(i, "<&sq>", "=");
+        i = fastReplace(i, "<&rb>", "]");
+        i = fastReplace(i, "<&lb>", "[");
+        i = fastReplace(i, "<&rc>", "}");
+        i = fastReplace(i, "<&lc>", "{");
         return i;
     }
 
