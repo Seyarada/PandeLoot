@@ -2,6 +2,9 @@ package net.seyarada.pandeloot.damage;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.seyarada.pandeloot.PandeLoot;
+import net.seyarada.pandeloot.StringLib;
+import net.seyarada.pandeloot.drops.StartDrops;
+import net.seyarada.pandeloot.items.LootBalloon;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -16,6 +19,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -77,18 +81,15 @@ public class DamageTracker implements Listener {
         UUID uuid = e.getEntity().getUniqueId();
         if(!loadedMobs.containsKey(uuid)) return;
 
-        if(e.getDamager() instanceof Player) {
-            addPlayerDamage(uuid, (Player) e.getDamager(), e.getFinalDamage());
-            return;
-        }
-
+        Player player = null;
+        if(e.getDamager() instanceof Player) player = (Player)e.getDamager();
         if(e.getDamager() instanceof Projectile) {
             if (((Projectile) e.getDamager()).getShooter() instanceof Player) {
-                Player player = (Player) (((Projectile) e.getDamager()).getShooter());
-                addPlayerDamage(uuid, player, e.getFinalDamage());
+                player = (Player) (((Projectile) e.getDamager()).getShooter());
             }
-        }
+        } if(player==null) return;
 
+        addPlayerDamage(uuid, player, e.getFinalDamage());
     }
 
     @EventHandler

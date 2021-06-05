@@ -9,60 +9,101 @@ import org.bukkit.entity.Entity;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class Config {
 
+    public static int debug;
+
+    public static final HashMap<String, String> defaultOptions = new HashMap<>();
+    public static final FileConfiguration config = new YamlConfiguration();
+    public static final FileConfiguration rewardContainers = new YamlConfiguration();
+    private static final FileConfiguration mobConfig = new YamlConfiguration();
+
     private static File dataFolder;
-
-    private static File mobFile;
-    private static File lootBagFile;
-    private static File lootTableFile;
     private static File configFile;
-
-    private static FileConfiguration mobConfig;
-    public static FileConfiguration lootBagConfig;
-    public static FileConfiguration lootTableConfig;
-    public static FileConfiguration config;
 
     public Config() {
         dataFolder = PandeLoot.getInstance().getDataFolder();
-
-        generateConfigFile();
-        generateLootTableFile();
-        generateLootBagFile();
-        generateMobFile();
-
         reload();
     }
 
     public static void reload() {
-        loadConfigFile();
-        loadLootTableFile();
-        loadLootBagFile();
-        loadMobFile();
+
+        configFile = generateFile("Config", "Config");
+        loadFile(configFile, config);
+
+        File mobFile = generateFile("Mobs", "Mobs");
+        loadFile(mobFile, mobConfig);
+
+        generateFolderAndLoadRewardContainers();
+        updateConfig();
+
+        ConfigurationSection defaultValues = config.getConfigurationSection("DefaultValues");
+        if(defaultValues==null) return;
+
+        Set<String> options = defaultValues.getKeys(false);
+        for(String option : options) {
+            defaultOptions.put(option.toLowerCase(), defaultValues.getString(option));
+        }
+
+        debug = config.getInt("Settings.Debug");
+
     }
 
-    public void generateConfigFile() {
-        configFile = new File(dataFolder, "Config.yml");
-        config = new YamlConfiguration();
-        if (!configFile.exists()) {
+    public static void generateFolderAndLoadRewardContainers() {
+        File rewardContainerFolder = new File(dataFolder, "RewardContainers");
+        rewardContainerFolder.mkdirs();
+
+        generateFile("RewardContainers/LootBags", "RewardContainers/LootBags");
+        generateFile("RewardContainers/LootTables", "RewardContainers/LootTables");
+        
+        StringBuilder combinedYaml = new StringBuilder();
+
+        for(File file : rewardContainerFolder.listFiles()) {
+            FileConfiguration rewardFile = YamlConfiguration.loadConfiguration(file);
+            combinedYaml.append(rewardFile.saveToString());
+            StringLib.warn("+ Loading file " + file.getName());
+        }
+
+        try {
+            rewardContainers.loadFromString(combinedYaml.toString());
+        } catch (InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static File generateFile(String internalPath, String showName) {
+        showName = showName+".yml";
+        internalPath = internalPath+".yml";
+
+        File file = new File(dataFolder, showName);
+        if (!file.exists()) {
             try {
                 // Load default
-                InputStreamReader iSR = new InputStreamReader(PandeLoot.getInstance().getResource("Config.yml"));
+                InputStreamReader iSR = new InputStreamReader(PandeLoot.getInstance().getResource(internalPath));
                 FileConfiguration internalConfig = YamlConfiguration.loadConfiguration(iSR);
                 internalConfig.options().copyDefaults(true);
-                internalConfig.save(configFile);
+                internalConfig.save(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-        updateConfig();
-
+        return file;
     }
 
-    public void updateConfig() {
+    public static void loadFile(File file, FileConfiguration fileConfig) {
+        try {
+            fileConfig.load(file);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void updateConfig() {
         InputStreamReader iSR = new InputStreamReader(PandeLoot.getInstance().getResource("Config.yml"));
         FileConfiguration internalConfig = YamlConfiguration.loadConfiguration(iSR);
 
@@ -76,118 +117,13 @@ public class Config {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
-
-    public static void loadConfigFile() {
-        try {
-            config.load(configFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void generateLootTableFile() {
-        lootTableFile = new File(dataFolder, "LootTables.yml");
-        lootTableConfig = new YamlConfiguration();
-        if (!lootTableFile.exists()) {
-            try {
-                // Load default
-                InputStreamReader iSR = new InputStreamReader(PandeLoot.getInstance().getResource("LootTables.yml"));
-                FileConfiguration internalConfig = YamlConfiguration.loadConfiguration(iSR);
-                internalConfig.options().copyDefaults(true);
-                internalConfig.save(lootTableFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void loadLootTableFile() {
-        try {
-            lootTableConfig.load(lootTableFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void generateLootBagFile() {
-        lootBagFile = new File(dataFolder, "LootBags.yml");
-        lootBagConfig = new YamlConfiguration();
-        if (!lootBagFile.exists()) {
-            try {
-                // Load default
-                InputStreamReader iSR = new InputStreamReader(PandeLoot.getInstance().getResource("LootBags.yml"));
-                FileConfiguration internalConfig = YamlConfiguration.loadConfiguration(iSR);
-                internalConfig.options().copyDefaults(true);
-                internalConfig.save(lootBagFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void loadMobFile() {
-        try {
-            mobConfig.load(mobFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void generateMobFile() {
-        mobFile = new File(dataFolder, "Mobs.yml");
-        mobConfig = new YamlConfiguration();
-        if (!mobFile.exists()) {
-            try {
-                // Load default
-                InputStreamReader iSR = new InputStreamReader(PandeLoot.getInstance().getResource("Mobs.yml"));
-                FileConfiguration internalConfig = YamlConfiguration.loadConfiguration(iSR);
-                internalConfig.options().copyDefaults(true);
-                internalConfig.save(mobFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void loadLootBagFile() {
-        try {
-            lootBagConfig.load(lootBagFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static ConfigurationSection getLootTableRaw(String lootTable) {
-        return lootTableConfig.getConfigurationSection(lootTable);
-    }
-
-    public static ConfigurationSection getLootBagRaw(String lootBag) {
-        return lootBagConfig.getConfigurationSection(lootBag);
-    }
-
-    public static List<String> getLootTable(String loottable) {
-        return lootTableConfig.getStringList(loottable+".Rewards");
-    }
-
-    public static List<String> getScoreHologram() {
-        return config.getStringList("Announcements.ScoreHologram");
-    }
-    public static List<String> getScoreMessage() {
-        return config.getStringList("Announcements.ScoreMessage");
-    }
-    public static int getRainbowFrequency() { return config.getInt("Settings.RainbowFrequency"); }
-    public static boolean getPlayArm() { return config.getBoolean("Settings.PlayArmWhenOpeningLootBag"); }
-    public static boolean getPlayArmEmpty() { return config.getBoolean("Settings.OnlyPlayArmIfBothEmpty"); }
 
     public static ConfigurationSection getMob(Entity entity) {
 
-        String entityType = entity.getType().toString();
-        String display = entity.getCustomName();
-        String world = entity.getWorld().getName();
+        final String entityType = entity.getType().toString();
+        final String display = entity.getCustomName();
+        final String world = entity.getWorld().getName();
 
         for(String i : mobConfig.getKeys(false)) {
 
@@ -202,27 +138,32 @@ public class Config {
             if(subWorld!=null && !subWorld.equalsIgnoreCase(world)) continue;
 
             return subConfig;
-
         }
         return null;
     }
 
-    public static String getDefault(String str) {
-        return config.getString("DefaultValues."+str);
+    public static ConfigurationSection getRewardContainer(String internalName) {
+        return rewardContainers.getConfigurationSection(internalName);
     }
 
+    public static List<String> getScoreHologram() {
+        return config.getStringList("Announcements.ScoreHologram");
+    }
+    public static List<String> getScoreMessage() {
+        return config.getStringList("Announcements.ScoreMessage");
+    }
+    public static int getRainbowFrequency() { return config.getInt("Settings.RainbowFrequency"); }
+    public static boolean getPlayArm() { return config.getBoolean("Settings.PlayArmWhenOpeningLootBag"); }
+    public static boolean getPlayArmEmpty() { return config.getBoolean("Settings.OnlyPlayArmIfBothEmpty"); }
     public static String getAbandonText() {
         return config.getString("Settings.AbandonText");
     }
-
     public static String getSecondsText() {
         return config.getString("Settings.TimeFormatSeconds");
     }
-
     public static String getMinutesText() {
         return config.getString("Settings.TimeFormatMinutes");
     }
-
     public static String getHoursText() {
         return config.getString("Settings.TimeFormatHours");
     }

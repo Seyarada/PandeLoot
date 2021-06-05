@@ -11,7 +11,7 @@ import net.Indyuce.mmoitems.api.item.template.explorer.TypeFilter;
 import net.Indyuce.mmoitems.api.player.PlayerData;
 import net.Indyuce.mmoitems.api.player.RPGPlayer;
 import net.seyarada.pandeloot.StringLib;
-import net.seyarada.pandeloot.rewards.RewardLine;
+import net.seyarada.pandeloot.rewards.RewardLineNew;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ public class MIGeneratorCompatibility {
     private static final Random random = new Random();
 
 
-    public static ItemStack getItem(String item, RewardLine reward, Player player) {
+    public static ItemStack getItem(String item, RewardLineNew reward, Player player) {
         if(player==null || reward.specialOptions.isEmpty()) return MMOItemsCompatibility.getItem(item, reward, player);
 
         Map<String, String> handler = reward.specialOptions;
@@ -51,7 +51,7 @@ public class MIGeneratorCompatibility {
         if (handler.containsKey("class"))
             builder.applyFilter(new ClassFilter(handler.get("class").replace("-", " ").replace("_", " ")));
 
-        builder.applyFilter(new TypeFilter(Type.get(reward.type)));
+        builder.applyFilter(new TypeFilter(Type.get(reward.insideOptions.get("type"))));
         builder.applyFilter(new IDFilter(item));
 
 
@@ -60,6 +60,7 @@ public class MIGeneratorCompatibility {
             StringLib.badMIGen(item);
             return new ItemStack(Material.AIR, 1);
         }
+
         ItemStack iS = optional.get().newBuilder(itemLevel, itemTier).build().newBuilder().build();
         Validate.isTrue((iS != null && iS.getType() != Material.AIR), "Could not generate item with ID '" + optional.get().getId() + "'");
         return iS;

@@ -3,6 +3,7 @@ package net.seyarada.pandeloot.utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.seyarada.pandeloot.Boosts;
 import net.seyarada.pandeloot.PandeLoot;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -12,10 +13,10 @@ import java.text.DecimalFormat;
 public class PlaceholderUtil {
 
     public static String parse(String i) {
-        return parse(i, null, null);
+        return parse(i, null, null, true);
     }
 
-    public static String parse(String i, DamageUtil damageUtil, Player player) {
+    public static String parse(String i, DamageUtil damageUtil, Player player, boolean doMath) {
 
         if(i==null || i.isEmpty()) return i;
 
@@ -80,7 +81,7 @@ public class PlaceholderUtil {
                 i = fastReplace(i, "%boost%", String.valueOf(globalBoost));
         }
 
-        if(i.contains("%math%") || i.contains("*") || i.contains("+")) {
+        if(doMath && (i.contains("%math%") || i.contains("*") || i.contains("+")) ) {
             i = fastReplace(i, "%math%", "");
             i = String.valueOf(parseMath(i));
         }

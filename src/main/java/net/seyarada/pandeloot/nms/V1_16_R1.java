@@ -74,7 +74,7 @@ public class V1_16_R1 {
                 lY += 0.2;
                 if(msg==null || msg.isEmpty()) continue;
 
-                msg = PlaceholderUtil.parse(msg, damageUtil, player);
+                msg = PlaceholderUtil.parse(msg, damageUtil, player, false);
 
                 final EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.ARMOR_STAND, wS);
                 armorStand.setPosition(lX, lY, lZ);

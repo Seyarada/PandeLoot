@@ -3,19 +3,30 @@ package net.seyarada.pandeloot.nms;
 import net.minecraft.server.v1_16_R3.*;
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
+import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.options.Options;
+import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.schedulers.HideEntity;
+import net.seyarada.pandeloot.utils.MathUtil;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -71,7 +82,7 @@ public class V1_16_R3 {
             Collections.reverse(messages);
 
             for (String msg : messages) {
-                msg = PlaceholderUtil.parse(msg, damageUtil, player);
+                msg = PlaceholderUtil.parse(msg, damageUtil, player, false);
                 if(msg!=null) lY += 0.2;
                 if(msg==null || msg.isEmpty()) continue;
 
@@ -82,6 +93,7 @@ public class V1_16_R3 {
                 armorStand.setCustomNameVisible(true);
                 armorStand.setInvisible(true);
                 armorStand.setMarker(true);
+                armorStand.setFireTicks(999999);
                 PacketPlayOutSpawnEntity packetPlayOutSpawnEntity = new PacketPlayOutSpawnEntity(armorStand, 1);
                 PacketPlayOutEntityMetadata metadata = new PacketPlayOutEntityMetadata(armorStand.getId(), armorStand.getDataWatcher(), true);
 

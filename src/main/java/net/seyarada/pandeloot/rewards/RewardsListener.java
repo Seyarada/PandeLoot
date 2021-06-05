@@ -5,11 +5,14 @@ import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.damage.MobOptions;
-import net.seyarada.pandeloot.drops.DropEffects;
-import net.seyarada.pandeloot.drops.DropItem;
-import net.seyarada.pandeloot.drops.DropManager;
+import net.seyarada.pandeloot.drops.Manager;
+import net.seyarada.pandeloot.drops.StartDrops;
 import net.seyarada.pandeloot.items.LootBag;
+import net.seyarada.pandeloot.items.LootBalloon;
 import net.seyarada.pandeloot.nms.NMSManager;
+import net.seyarada.pandeloot.options.OptionType;
+import net.seyarada.pandeloot.options.Options;
+import net.seyarada.pandeloot.options.Reward;
 import net.seyarada.pandeloot.utils.ChatUtil;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,16 +23,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class RewardsListener implements Listener {
 
@@ -42,12 +45,14 @@ public class RewardsListener implements Listener {
             ItemStack iS = e.getPlayer().getInventory().getItemInMainHand();
             if(NMSManager.hasTag(iS, StringLib.bag)) {
                 String lootBag = NMSManager.getTag(iS, StringLib.bag);
-                Location fLoc = e.getPlayer().getLocation();
 
                 iS.setAmount(iS.getAmount()-1);
 
-                List<RewardLine> rewards = RewardLine.StringListToRewardList(Config.getLootBagRaw(lootBag).getStringList("Rewards"));
-                new DropManager(e.getPlayer(), fLoc, rewards).initDrops();
+
+                List<String> rewardsStringList = Config.getRewardContainer(lootBag).getStringList("Rewards");
+                List<RewardLineNew> rewards = rewardsStringList.stream().map(RewardLineNew::new).collect(Collectors.toList());
+
+                new Manager().fromRewardLine(Collections.singletonList(e.getPlayer()), rewards, null, null);
 
                 return;
 
@@ -59,11 +64,18 @@ public class RewardsListener implements Listener {
             for(Entity i : loc.getWorld().getNearbyEntities(loc, 1.5, 1.5 ,1.5)) {
                 if(i instanceof Item) {
 
+                    if(NMSManager.hasTag(((Item)i).getItemStack(), StringLib.root)) {
+                        StringLib.warn("+ "+NMSManager.getTag(((Item)i).getItemStack(), StringLib.root));
+                        if(!NMSManager.getTag(((Item)i).getItemStack(), StringLib.root).equals(e.getPlayer().getName()))
+                            continue;
+                    };
+
                     if ( NMSManager.hasTag(((Item)i).getItemStack(), StringLib.bag) ) {
                         if(NMSManager.hasTag(((Item)i).getItemStack(), StringLib.onUse)) continue;
 
                         String lootBag = NMSManager.getTag(((Item)i).getItemStack(), StringLib.bag);
-                        LootBag LootBag = new LootBag(Config.getLootBagRaw(lootBag), new RewardLine(lootBag));
+                        // TODO: Improve this
+                        LootBag LootBag = new LootBag(lootBag, new Reward(new RewardLineNew("air"), e.getPlayer(), null));
 
                         LootBag.doGroundDrop(e.getPlayer(), (Item)i);
                     }
@@ -79,29 +91,39 @@ public class RewardsListener implements Listener {
             Player player = (Player) e.getEntity();
             ItemStack iS = e.getItem().getItemStack();
 
-            if (NMSManager.hasTag(iS, StringLib.preventPickup) || NMSManager.hasTag(iS, StringLib.onUse)) {
-                e.setCancelled(true);
-                return;
-            }
-
             if(NMSManager.hasTag(iS, StringLib.root) && !NMSManager.getTag(iS, StringLib.root).equals(player.getName())) {
                 e.setCancelled(true);
                 return;
             }
 
             if(NMSManager.hasTag(iS, StringLib.playOnPickup)) {
-                DropItem source = DropEffects.playOnPickupStorage.get(UUID.fromString(NMSManager.getTag(iS, StringLib.playOnPickup)));
-                if(source.reward.playonpickup=true)
-                    source.player = player;
-                new DropEffects(source, true);
+                RewardLineNew a = new RewardLineNew(NMSManager.getTag(iS, StringLib.playOnPickup));
+                Reward b = new Reward(a,player,null);
+                b.item = e.getItem();
+                Options.callOptions(b, OptionType.GENERAL);
+                Options.callOptions(b, OptionType.PLAYER);
+            }
+
+            if (NMSManager.hasTag(iS, StringLib.preventPickup) || NMSManager.hasTag(iS, StringLib.onUse)) {
+                e.setCancelled(true);
+                return;
+            }
+
+            if(NMSManager.hasTag(iS, StringLib.skin)) {
+                RewardLineNew a = new RewardLineNew(NMSManager.getTag(iS, StringLib.skin));
+                Reward b = new Reward(a,player,null);
+                b.options.put("skin", null);
+                b.getItemStack(player);
+                iS = b.getItemStack(player);
+                iS.setAmount(a.amount);
             }
 
             iS = NMSManager.removeNBT(iS, StringLib.playOnPickup);
-            e.getItem().setItemStack( iS );
             iS = NMSManager.removeNBT(iS, StringLib.preventStack);
-            e.getItem().setItemStack( iS );
             iS = NMSManager.removeNBT(iS, StringLib.root);
+
             e.getItem().setItemStack( iS );
+            player.updateInventory();
         }
     }
 
@@ -121,30 +143,39 @@ public class RewardsListener implements Listener {
         Entity mob = e.getEntity();
         UUID uuid = mob.getUniqueId();
 
+        StringLib.warn("+ Detected death of mob: "+mob);
+
         // Don't drop if the mob isn't loaded or nobody has damaged it
         if(!DamageTracker.loadedMobs.containsKey(uuid)) return;
         DamageTracker.loadedMobs.remove(uuid);
         if(!DamageTracker.damageTracker.containsKey(uuid)) return;
         if(DamageTracker.get(uuid).size()==0) return;
 
-        ConfigurationSection config = Config.getMob(mob);
-        boolean rank = config.getBoolean("Options.ScoreMessage");
-        boolean score = config.getBoolean("Options.ScoreHologram");
+        StringLib.warn("++ Starting lootbag drop...");
 
-        List<String> strings = config.getStringList("Rewards");
-        List<RewardLine> rewards = RewardLine.StringListToRewardList(strings);
+        final ConfigurationSection config = Config.getMob(mob);
+        final boolean rank = config.getBoolean("Options.ScoreMessage");
+        final boolean score = config.getBoolean("Options.ScoreHologram");
+        final List<String> stringRewards = config.getStringList("Rewards");
+        final DamageUtil damageUtil = new DamageUtil(uuid);
 
-        DamageUtil damageUtil = new DamageUtil(uuid);
+        StringLib.warn("+++ The option rank is: "+rank);
+        StringLib.warn("+++ The option score is: "+score);
+        StringLib.warn("++ The Rewards to drop are:");
+        for(String reward : stringRewards) {
+                StringLib.warn("+++ "+reward);
+        }
+
         if(DamageTracker.lastHits.containsKey(uuid)) {
             damageUtil.lastHit = DamageTracker.lastHits.get(uuid);
+            StringLib.warn("++ Stored "+ DamageTracker.lastHits.get(uuid).getName() +" as lasthit");
             DamageTracker.lastHits.remove(uuid);
         }
-        DropManager manager = new DropManager(Arrays.asList(damageUtil.getPlayers()), rewards);
+
+        new StartDrops(Arrays.asList(damageUtil.getPlayers()), stringRewards, damageUtil, mob.getLocation());
 
         if(rank) ChatUtil.announceChatRank(damageUtil);
         if(score) NMSManager.spawnHologram(damageUtil);
-        manager.setDamageUtil(damageUtil);
-        manager.initDrops();
     }
 
 }

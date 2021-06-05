@@ -19,14 +19,14 @@ public class ColorUtil {
     public static final String[] chatColors = new String[]{"AQUA", "BLACK", "BLUE", "DARK_AQUA", "DARK_BLUE", "DARK_GRAY", "DARK_GREEN", "DARK_PURPLE", "DARK_RED", "GOLD", "GRAY", "GREEN", "LIGHT_PURPLE", "RED", "WHITE", "YELLOW"};
     private static final Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
 
-    public static void setColorEffects(Item item, String color, Player player, Location location, double beam) {
+    public static void setColorEffects(Item item, String color, Player player, double beam) {
         color = getColor(item, color);
 
         if(color.equals("RAINBOW")) {
             if (player != null) {
                 new RainbowRunner(item, player, beam);
             } else
-                new RainbowRunner(item, location, beam);
+                new RainbowRunner(item, item.getLocation(), beam);
             return;
         }
 
@@ -35,13 +35,13 @@ public class ColorUtil {
         if (player != null) {
             new ParticleTrail(item, color, player);
         } else
-            new ParticleTrail(item, color, location);
+            new ParticleTrail(item, color, item.getLocation());
 
         if (beam > 0) {
             if (player != null) {
                 new Beam(item, color, player, beam);
             } else
-                new Beam(item, color, location, beam);
+                new Beam(item, color, item.getLocation(), beam);
         }
     }
 
@@ -69,24 +69,7 @@ public class ColorUtil {
         if(color.equalsIgnoreCase("display")) {
             if(item.getItemStack().getItemMeta().hasDisplayName()) {
                 String display = item.getItemStack().getItemMeta().getDisplayName().substring(0, 2);
-                switch (display) {
-                    case "§0": return "BLACK";
-                    case "§1": return "DARK_BLUE";
-                    case "§2": return "DARK_GREEN";
-                    case "§3": return "DARK_AQUA";
-                    case "§4": return "DARK_RED";
-                    case "§5": return "DARK_PURPLE";
-                    case "§6": return "GOLD";
-                    case "§7": return "GRAY";
-                    case "§8": return "DARK_GRAY";
-                    case "§9": return "BLUE";
-                    case "§a": return "GREEN";
-                    case "§b": return "AQUA";
-                    case "§c": return "RED";
-                    case "§d": return "LIGHT_PURPLE";
-                    case "§e": return "YELLOW";
-                    default:   return "WHITE";
-                }
+                return colorSwitch(display.substring(1));
             } else return "WHITE";
         }
 
@@ -96,6 +79,27 @@ public class ColorUtil {
         }
 
         return color.toUpperCase();
+    }
+
+    public static String colorSwitch(String color) {
+        switch (color) {
+            case "0": return "BLACK";
+            case "1": return "DARK_BLUE";
+            case "2": return "DARK_GREEN";
+            case "3": return "DARK_AQUA";
+            case "4": return "DARK_RED";
+            case "5": return "DARK_PURPLE";
+            case "6": return "GOLD";
+            case "7": return "GRAY";
+            case "8": return "DARK_GRAY";
+            case "9": return "BLUE";
+            case "a": return "GREEN";
+            case "b": return "AQUA";
+            case "c": return "RED";
+            case "d": return "LIGHT_PURPLE";
+            case "e": return "YELLOW";
+            default:   return "WHITE";
+        }
     }
 
     public static Color getRGB(String color) {

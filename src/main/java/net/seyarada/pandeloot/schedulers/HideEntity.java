@@ -23,7 +23,7 @@ public class HideEntity {
         id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             if (toHide.isValid()) {
 
-                for (Entity entity : toHide.getNearbyEntities(36, 36, 36)) {
+                for (Entity entity : toHide.getNearbyEntities(42, 42, 42)) {
                     if (entity instanceof Player && !canView.contains(entity)) {
                         NMSManager.destroyEntity(toHide.getEntityId(), entity);
                     }

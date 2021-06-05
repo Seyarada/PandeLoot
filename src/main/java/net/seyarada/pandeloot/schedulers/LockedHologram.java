@@ -5,6 +5,9 @@ import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.drops.DropEffects;
 import net.seyarada.pandeloot.nms.NMSManager;
+import net.seyarada.pandeloot.nms.PacketLockedHologram;
+import net.seyarada.pandeloot.options.Options;
+import net.seyarada.pandeloot.options.Reward;
 import net.seyarada.pandeloot.utils.MathUtil;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Bukkit;
@@ -25,20 +28,22 @@ public class LockedHologram {
     private ArmorStand abandonEntity;
 
     private int abandonTime;
-    private boolean isAbandoned;
     private String abandonText;
     private String timeText;
 
     // This generates a hologram(s) that locks into an  entity/item
 
-    public LockedHologram(Entity toTrack, List<String> toDisplay, Player player, int aT, boolean isAbandoned) {
+    public LockedHologram(Entity toTrack, List<String> toDisplay, Player player, int aT, Reward reward) {
+
+        new PacketLockedHologram().spawnLockedHologram(toTrack, toTrack.getLocation(), toDisplay, Collections.singletonList(player), aT, reward);
+        if(true) return;
+
         this.abandonTime = 20*aT; // Field   ===-------- Longinus fork
-        this.isAbandoned = isAbandoned;
         if(toTrack==null) return;
         Collections.reverse(toDisplay);
 
         if(abandonTime>0) {
-            abandonText = PlaceholderUtil.parse(Config.getAbandonText(), null, player);
+            abandonText = PlaceholderUtil.parse(Config.getAbandonText(), null, player, false);
             List<String> strs = Arrays.asList(abandonText.split(","));
             Collections.reverse(strs);
             toDisplay.add("");
@@ -46,7 +51,7 @@ public class LockedHologram {
         }
 
         Plugin plugin = PandeLoot.getInstance();
-        generateHolograms(toTrack.getLocation(), toDisplay, player);
+        generateHolograms(toTrack.getLocation(), toDisplay, player, reward);
 
         id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
 
@@ -63,14 +68,16 @@ public class LockedHologram {
                     Location location = toTrack.getLocation();
                     ItemStack itemStack = ((Item) toTrack).getItemStack();
                     itemStack = NMSManager.removeNBT(itemStack, StringLib.root);
-                    UUID uuid = toTrack.getUniqueId();
 
                     toTrack.remove();
 
                     Item newItem = location.getWorld().dropItem(location, itemStack);
                     newItem.setVelocity(new Vector());
-                    new DropEffects(uuid, newItem);
-
+                    reward.item = newItem;
+                    reward.options.put("abandontime", "0");
+                    reward.player = null;
+                    reward.isAbandoned = true;
+                    Options.callOptions(reward);
                 }
 
             } else {
@@ -86,7 +93,7 @@ public class LockedHologram {
         }, 0, 1);
     }
 
-    public void generateHolograms(Location location, List<String> toDisplay, Player player) {
+    public void generateHolograms(Location location, List<String> toDisplay, Player player, Reward reward) {
         World world = location.getWorld();
         double y = 0.45;
 
@@ -112,7 +119,7 @@ public class LockedHologram {
                 timeText = i;
             }
 
-            if(!isAbandoned)
+            if(!reward.isAbandoned)
                 new HideEntity(armorStand, Collections.singletonList(player));
 
             holograms.add(armorStand);

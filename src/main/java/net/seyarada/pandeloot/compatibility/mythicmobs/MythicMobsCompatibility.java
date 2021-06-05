@@ -18,9 +18,11 @@ import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.damage.MobOptions;
-import net.seyarada.pandeloot.drops.DropManager;
+import net.seyarada.pandeloot.drops.Manager;
+import net.seyarada.pandeloot.drops.StartDrops;
 import net.seyarada.pandeloot.nms.NMSManager;
-import net.seyarada.pandeloot.rewards.RewardLine;
+import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.rewards.RewardLineNew;
 import net.seyarada.pandeloot.utils.ChatUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,24 +41,24 @@ public class MythicMobsCompatibility implements Listener {
         return null;
     }
 
-    public static Map.Entry<Collection<Drop>, DropMetadata> getDropTableDrops(RewardLine i, Player player, DamageUtil damageUtil) {
+    public static Map.Entry<Collection<Drop>, DropMetadata> getDropTableDrops(Reward i) {
         DropTable dropTable;
-        Optional<DropTable> maybeTable = MythicMobs.inst().getDropManager().getDropTable(i.item);
+        Optional<DropTable> maybeTable = MythicMobs.inst().getDropManager().getDropTable(i.rewardLine.item);
         if(maybeTable.isPresent()) {
             dropTable = maybeTable.get();
             DropMetadata dropMeta;
-            if(player==null&&damageUtil==null) {
+            if(i.player==null && i.damageUtil==null) {
                 dropMeta = null;
-            } else if (player==null) {
-                AbstractEntity entity = BukkitAdapter.adapt(damageUtil.entity);
+            } else if (i.player==null) {
+                AbstractEntity entity = BukkitAdapter.adapt(i.damageUtil.entity);
                 ActiveMob caster = MythicMobs.inst().getMobManager().getMythicMobInstance(entity);
                 dropMeta = new DropMetadata(caster, null);
-            } else if(damageUtil==null) {
-                AbstractPlayer p = BukkitAdapter.adapt(player);
+            } else if(i.damageUtil==null) {
+                AbstractPlayer p = BukkitAdapter.adapt(i.player);
                 dropMeta = new DropMetadata(null, p);
             } else {
-                AbstractPlayer p = BukkitAdapter.adapt(player);
-                AbstractEntity entity = BukkitAdapter.adapt(damageUtil.entity);
+                AbstractPlayer p = BukkitAdapter.adapt(i.player);
+                AbstractEntity entity = BukkitAdapter.adapt(i.damageUtil.entity);
                 ActiveMob caster = MythicMobs.inst().getMobManager().getMythicMobInstance(entity);
                 dropMeta = new DropMetadata(caster, p);
             }
@@ -81,16 +83,13 @@ public class MythicMobsCompatibility implements Listener {
         boolean score = config.getBoolean("Options.ScoreHologram");
 
         List<String> strings = e.getMobType().getConfig().getStringList("Rewards");
-        List<RewardLine> rewards = RewardLine.StringListToRewardList(strings);
 
         DamageUtil damageUtil = new DamageUtil(mob);
         if(e.getKiller() instanceof Player) damageUtil.lastHit = (Player) e.getKiller();
-        DropManager manager = new DropManager(Arrays.asList(damageUtil.getPlayers()), rewards);
+        new StartDrops(Arrays.asList(damageUtil.getPlayers()), strings, damageUtil, e.getEntity().getLocation());
 
         if(rank) ChatUtil.announceChatRank(damageUtil);
         if(score) NMSManager.spawnHologram(damageUtil);
-        manager.setDamageUtil(damageUtil);
-        manager.initDrops();
     }
 
     @EventHandler

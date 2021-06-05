@@ -4,6 +4,8 @@ import net.milkbowl.vault.economy.Economy;
 import net.seyarada.pandeloot.commands.*;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageTracker;
+import net.seyarada.pandeloot.items.LootBalloon;
+import net.seyarada.pandeloot.options.RegisterOptions;
 import net.seyarada.pandeloot.rewards.RewardsListener;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -28,8 +30,13 @@ public class PandeLoot extends JavaPlugin {
             MythicMobsCompatibility mmComp = new MythicMobsCompatibility();
             this.getServer().getPluginManager().registerEvents(mmComp, this);
         }
+
+        new RegisterOptions();
+
         this.getServer().getPluginManager().registerEvents(new DamageTracker(), this);
         this.getServer().getPluginManager().registerEvents(new RewardsListener(), this);
+
+        this.getServer().getPluginManager().registerEvents(new LootBalloon(null, null), this);
 
         this.getCommand("pandeloot").setExecutor(new CommandManager());
 
