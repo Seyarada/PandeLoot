@@ -2,7 +2,7 @@ package net.seyarada.pandeloot.options.mechanics;
 
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.options.MechanicEvent;
-import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.rewards.Reward;
 import net.seyarada.pandeloot.utils.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
@@ -19,7 +19,9 @@ public class ExplodeMechanic implements MechanicEvent {
 
             if(shouldExplode) {
                 final Map<String, String> options = reward.options;
-                final String type = options.get("explodetype");
+                final String type = options.get("explodetype").toLowerCase();
+
+                StringLib.warn("++++++ Explode effect is type "+type);
 
                 switch (type) {
                     default:
@@ -45,12 +47,16 @@ public class ExplodeMechanic implements MechanicEvent {
     }
 
     private void doRadialDrop(Reward reward) {
+        StringLib.warn("++++++ Executing radial drop to "+reward.item);
         final Map<String, String> options = reward.options;
         final double radius = Double.parseDouble(options.get("exploderadius"));
         final Item item = reward.item;
 
         final int numberOfTotalDrops = reward.radialDropInformation.get(radius);
         final int numberOfThisDrop = reward.radialOrder;
+
+        StringLib.warn("++++++ Total radial drops: "+numberOfTotalDrops);
+        StringLib.warn("++++++ Order of this drop: "+numberOfThisDrop);
 
         if(numberOfTotalDrops==1) { doSpreadDrop(reward); return; }
 

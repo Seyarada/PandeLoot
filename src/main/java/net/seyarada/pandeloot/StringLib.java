@@ -1,6 +1,6 @@
 package net.seyarada.pandeloot;
 
-import net.seyarada.pandeloot.rewards.RewardLineNew;
+import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -18,7 +18,7 @@ public class StringLib {
 
     public static int depthBonus;
 
-    public static void badItemStack(RewardLineNew reward) {
+    public static void badItemStack(RewardLine reward) {
         System.err.println(prefix+" Couldn't create the item -"+reward.item+"- from origin "+reward.origin);
     }
 

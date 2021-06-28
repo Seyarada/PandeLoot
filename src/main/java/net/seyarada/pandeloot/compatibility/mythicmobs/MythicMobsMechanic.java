@@ -8,12 +8,16 @@ import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
 import io.lumine.xikage.mythicmobs.skills.ITargetedLocationSkill;
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import net.seyarada.pandeloot.rewards.RewardLineNew;
+import net.seyarada.pandeloot.damage.DamageTracker;
+import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.drops.StartDrops;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Listener;
+import org.bukkit.entity.Player;
 
-public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocationSkill, ITargetedEntitySkill, Listener {
+import java.util.Collections;
+
+public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocationSkill, ITargetedEntitySkill {
 
 
     public MythicMobsMechanic(MythicLineConfig config) {
@@ -29,12 +33,10 @@ public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocati
         int k = i.lastIndexOf("}");
         i = i.substring(j, k);
 
-        RewardLineNew lineConfig = new RewardLineNew(i);
         Location location = BukkitAdapter.adapt(abstractLocation);
-        //new DropManager(location, Collections.singletonList(lineConfig)).initDrops();
 
-        //new Manager().RewardLine(Collections.singletonList(p), Collections.singletonList(lineConfig), new DamageUtil(uuid), location);
-
+        new StartDrops(null, Collections.singletonList(i), null, location);
+        //new Manager().fromRewardLine(Collections.singletonList(p), Collections.singletonList(lineConfig), new DamageUtil(uuid), location);
         return false;
     }
 
@@ -45,15 +47,18 @@ public class MythicMobsMechanic extends SkillMechanic implements ITargetedLocati
         int k = i.lastIndexOf("}");
         i = i.substring(j, k);
 
-        //if(entity instanceof Player) {
-        //    manager = new DropManager((Player) entity, BukkitAdapter.adapt(skillMetadata.getCaster().getLocation()), Collections.singletonList(lineConfig));
-        // } else {
-        //    manager = new DropManager(entity.getLocation(), Collections.singletonList(lineConfig));
-        // }
-        //if(DamageTracker.loadedMobs.containsKey(skillMetadata.getCaster().getEntity().getUniqueId())) {
-        //    manager.damageUtil = new DamageUtil(skillMetadata.getCaster().getEntity().getUniqueId());
-        //}
-        //manager.initDrops();
+        Entity entity = abstractEntity.getBukkitEntity();
+
+        DamageUtil damageUtil = null;
+        if(DamageTracker.loadedMobs.containsKey(skillMetadata.getCaster().getEntity().getUniqueId())) {
+            damageUtil = new DamageUtil(skillMetadata.getCaster().getEntity().getUniqueId());
+        }
+
+        if(entity instanceof Player) {
+            new StartDrops(Collections.singletonList((Player) entity), Collections.singletonList(i), damageUtil, entity.getLocation());
+        } else {
+            new StartDrops(null, Collections.singletonList(i), damageUtil, entity.getLocation());
+        }
         return false;
     }
 }

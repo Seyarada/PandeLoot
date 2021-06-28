@@ -4,7 +4,7 @@ import net.milkbowl.vault.economy.Economy;
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.options.MechanicEvent;
-import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.rewards.Reward;
 import org.bukkit.Bukkit;
 
 public class MoneyMechanic implements MechanicEvent {

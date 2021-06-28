@@ -48,13 +48,13 @@ public class PlaceholderNew {
             if(damageUtil!=null) {
                 switch(i.substring(first, second)) {
                     case "%player.dmg%":
-                        str = df.format(damageUtil.getPlayerDamage(player));
+                        str = df.format(damageUtil.getPlayerDamage(player)).replace(",", ".");
                         placeholderBuilder.replace(first, second, str); break;
                     case "%player.pdmg%":
-                        str = df.format(damageUtil.getPercentageDamage(player));
+                        str = df.format(damageUtil.getPercentageDamage(player)).replace(",", ".");
                         placeholderBuilder.replace(first, second, str); break;
                     case "%player.pdmg100%":
-                        str = df.format(damageUtil.getPercentageDamage(player)*100);
+                        str = df.format(damageUtil.getPercentageDamage(player)*100).replace(",", ".");
                         placeholderBuilder.replace(first, second, str); break;
                     case "%player.rank%":
                         str = String.valueOf(damageUtil.getPlayerRank(player));
@@ -64,18 +64,18 @@ public class PlaceholderNew {
                     case "%mob.hp%":
                         placeholderBuilder.replace(first, second, String.valueOf(damageUtil.getEntityHealth())); break;
                     case "%lasthit%":
-                        placeholderBuilder.replace(first, second, damageUtil.lastHit.getName()); break;
+                        placeholderBuilder.replace(first, second, damageUtil.getLasthit().getName()); break;
                     case "%lasthit.dmg%":
-                        str = df.format(damageUtil.getPlayerDamage(damageUtil.lastHit));
+                        str = df.format(damageUtil.getPlayerDamage(damageUtil.getLasthit())).replace(",", ".");
                         placeholderBuilder.replace(first, second, str); break;
                     case "%lasthit.pdmg%":
-                        str = df.format(damageUtil.getPercentageDamage(damageUtil.lastHit));
+                        str = df.format(damageUtil.getPercentageDamage(damageUtil.getLasthit())).replace(",", ".");
                         placeholderBuilder.replace(first, second, str); break;
                     case "%lasthit.pdmg100%":
-                        str = df.format(damageUtil.getPercentageDamage(damageUtil.lastHit)*100);
+                        str = df.format(damageUtil.getPercentageDamage(damageUtil.getLasthit())*100).replace(",", ".");
                         placeholderBuilder.replace(first, second, str); break;
                     case "%lasthit.rank%":
-                        str = String.valueOf(damageUtil.getPlayerRank(damageUtil.lastHit));
+                        str = String.valueOf(damageUtil.getPlayerRank(damageUtil.getLasthit()));
                         placeholderBuilder.replace(first, second, str); break;
                     case "%boost%":
                         int globalBoost = Boosts.getGlobalBoost();

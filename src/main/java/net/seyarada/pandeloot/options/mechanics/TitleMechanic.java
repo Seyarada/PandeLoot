@@ -2,7 +2,7 @@ package net.seyarada.pandeloot.options.mechanics;
 
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.options.MechanicEvent;
-import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.rewards.Reward;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public class TitleMechanic implements MechanicEvent {
         int titleDuration = Integer.parseInt(options.get("titleduration"));
         if(titleDuration==0) titleDuration=20;
 
-        if(!title.isEmpty() || !subtitle.isEmpty()) {
+        if( ( title!=null && !title.isEmpty() ) || ( subtitle!=null && !subtitle.isEmpty() ) ) {
             StringLib.warn("++++++ Applying title effect with value "+value);
             reward.player.sendTitle(title, subtitle, titleFade, titleDuration, titleFade);
         }

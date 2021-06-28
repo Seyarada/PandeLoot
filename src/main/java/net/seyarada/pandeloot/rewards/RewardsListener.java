@@ -8,12 +8,11 @@ import net.seyarada.pandeloot.damage.MobOptions;
 import net.seyarada.pandeloot.drops.Manager;
 import net.seyarada.pandeloot.drops.StartDrops;
 import net.seyarada.pandeloot.items.LootBag;
-import net.seyarada.pandeloot.items.LootBalloon;
 import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.options.OptionType;
 import net.seyarada.pandeloot.options.Options;
-import net.seyarada.pandeloot.options.Reward;
 import net.seyarada.pandeloot.utils.ChatUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -23,12 +22,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -50,7 +51,7 @@ public class RewardsListener implements Listener {
 
 
                 List<String> rewardsStringList = Config.getRewardContainer(lootBag).getStringList("Rewards");
-                List<RewardLineNew> rewards = rewardsStringList.stream().map(RewardLineNew::new).collect(Collectors.toList());
+                List<RewardLine> rewards = rewardsStringList.stream().map(RewardLine::new).collect(Collectors.toList());
 
                 new Manager().fromRewardLine(Collections.singletonList(e.getPlayer()), rewards, null, null);
 
@@ -75,7 +76,7 @@ public class RewardsListener implements Listener {
 
                         String lootBag = NMSManager.getTag(((Item)i).getItemStack(), StringLib.bag);
                         // TODO: Improve this
-                        LootBag LootBag = new LootBag(lootBag, new Reward(new RewardLineNew("air"), e.getPlayer(), null));
+                        LootBag LootBag = new LootBag(lootBag, new Reward(new RewardLine("air"), e.getPlayer(), null));
 
                         LootBag.doGroundDrop(e.getPlayer(), (Item)i);
                     }
@@ -97,7 +98,8 @@ public class RewardsListener implements Listener {
             }
 
             if(NMSManager.hasTag(iS, StringLib.playOnPickup)) {
-                RewardLineNew a = new RewardLineNew(NMSManager.getTag(iS, StringLib.playOnPickup));
+                StringLib.warn("+ Applying playOnPickup");
+                RewardLine a = new RewardLine(NMSManager.getTag(iS, StringLib.playOnPickup));
                 Reward b = new Reward(a,player,null);
                 b.item = e.getItem();
                 Options.callOptions(b, OptionType.GENERAL);
@@ -105,12 +107,13 @@ public class RewardsListener implements Listener {
             }
 
             if (NMSManager.hasTag(iS, StringLib.preventPickup) || NMSManager.hasTag(iS, StringLib.onUse)) {
+                StringLib.warn("+ Applying preventPickup");
                 e.setCancelled(true);
                 return;
             }
 
             if(NMSManager.hasTag(iS, StringLib.skin)) {
-                RewardLineNew a = new RewardLineNew(NMSManager.getTag(iS, StringLib.skin));
+                RewardLine a = new RewardLine(NMSManager.getTag(iS, StringLib.skin));
                 Reward b = new Reward(a,player,null);
                 b.options.put("skin", null);
                 b.getItemStack(player);
@@ -154,6 +157,8 @@ public class RewardsListener implements Listener {
         StringLib.warn("++ Starting lootbag drop...");
 
         final ConfigurationSection config = Config.getMob(mob);
+        if(config==null) return;
+
         final boolean rank = config.getBoolean("Options.ScoreMessage");
         final boolean score = config.getBoolean("Options.ScoreHologram");
         final List<String> stringRewards = config.getStringList("Rewards");
@@ -168,11 +173,14 @@ public class RewardsListener implements Listener {
 
         if(DamageTracker.lastHits.containsKey(uuid)) {
             damageUtil.lastHit = DamageTracker.lastHits.get(uuid);
-            StringLib.warn("++ Stored "+ DamageTracker.lastHits.get(uuid).getName() +" as lasthit");
+            StringLib.warn("++ Stored "+ Bukkit.getPlayer(DamageTracker.lastHits.get(uuid)).getName() +" as lasthit");
             DamageTracker.lastHits.remove(uuid);
         }
-
-        new StartDrops(Arrays.asList(damageUtil.getPlayers()), stringRewards, damageUtil, mob.getLocation());
+        List<Player> dropPlayers = new ArrayList<>();
+        for(UUID playerUUID : damageUtil.getPlayers()) {
+            dropPlayers.add(Bukkit.getPlayer(playerUUID));
+        }
+        new StartDrops(dropPlayers, stringRewards, damageUtil, mob.getLocation());
 
         if(rank) ChatUtil.announceChatRank(damageUtil);
         if(score) NMSManager.spawnHologram(damageUtil);

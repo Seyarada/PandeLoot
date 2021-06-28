@@ -1,5 +1,8 @@
 package net.seyarada.pandeloot.options;
 
+import net.seyarada.pandeloot.rewards.Reward;
+import net.seyarada.pandeloot.utils.PlaceholderUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +22,7 @@ public class Options {
     }
 
     public static void callOptions(Reward reward) {
-
+        reward.options.replaceAll( (k,v)->v= PlaceholderUtil.parse(v, reward.damageUtil, reward.player, false));
         if(Boolean.parseBoolean(reward.options.get("playonpickup"))) {
             if(reward.item!=null)
                 callOptions(reward, OptionType.ITEM);

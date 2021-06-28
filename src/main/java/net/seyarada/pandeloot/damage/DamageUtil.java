@@ -13,13 +13,13 @@ import java.util.*;
 public class DamageUtil {
 
     private final double totalHP;
-    private final LinkedList<Map.Entry<Player, Double>> rankedPlayers;
-    private final Map<Player, Double> playerDamage;
-    private final Player[] player;
+    private final LinkedList<Map.Entry<UUID, Double>> rankedPlayers;
+    private final Map<UUID, Double> playerDamage;
+    private final UUID[] player;
     private final Double[] damage;
     private final UUID uuid;
 
-    public Player lastHit;
+    public UUID lastHit;
 
     public final Entity entity;
 
@@ -33,20 +33,20 @@ public class DamageUtil {
         totalHP = playerDamage.values().stream().mapToDouble(Double::valueOf).sum();
 
         // Gives a sorted list of players with more damage -> players with less damage
-        Comparator<Map.Entry<Player, Double>> comparator = Map.Entry.comparingByValue();
-        LinkedList<Map.Entry<Player, Double>> linkedList = new LinkedList<>(playerDamage.entrySet());
+        Comparator<Map.Entry<UUID, Double>> comparator = Map.Entry.comparingByValue();
+        LinkedList<Map.Entry<UUID, Double>> linkedList = new LinkedList<>(playerDamage.entrySet());
         linkedList.sort(comparator.reversed());
         rankedPlayers = linkedList;
 
-        List<Player> players = new ArrayList<>();
+        List<UUID> players = new ArrayList<>();
         List<Double> damages = new ArrayList<>();
 
-        for(Map.Entry<Player, Double> i : rankedPlayers) {
+        for(Map.Entry<UUID, Double> i : rankedPlayers) {
             players.add(i.getKey());
             damages.add(i.getValue());
         }
 
-        player = players.toArray(new Player[0]);
+        player = players.toArray(new UUID[0]);
         damage = damages.toArray(new Double[0]);
 
         location = entity.getLocation();
@@ -57,33 +57,37 @@ public class DamageUtil {
         return totalHP;
     }
 
-    public LinkedList<Map.Entry<Player, Double>> getRankedPlayers() {
+    public LinkedList<Map.Entry<UUID, Double>> getRankedPlayers() {
         return rankedPlayers;
     }
 
-    public Player[] getPlayers() {
+    public UUID[] getPlayers() {
         return player;
     }
 
     public double getPlayerDamage(Player player) {
-        return playerDamage.get(player);
+        return playerDamage.get(player.getUniqueId());
     }
 
     public Player getPlayer(int index) {
-        return player[index];
+        return Bukkit.getPlayer(player[index]);
     }
 
     public double getDamage(int index) {
         double dmg = ( damage[index] / getTotalHP() ) * 100.0;
         DecimalFormat df = new DecimalFormat("#.##");
 
-        return Double.parseDouble(df.format(dmg));
+        return Double.parseDouble(df.format(dmg).replace(",", "."));
+    }
+
+    public Player getLasthit() {
+        return Bukkit.getPlayer(lastHit);
     }
 
     public int getPlayerRank(Player p) {
         int k = 1;
-        for(Player i : player) {
-            if(i.equals(p))
+        for(UUID i : player) {
+            if(i.equals(p.getUniqueId()))
                 return k;
             k++;
         }
@@ -101,7 +105,7 @@ public class DamageUtil {
     }
 
     public double getPercentageDamage(Player player) {
-        return playerDamage.get(player)/totalHP;
+        return playerDamage.get(player.getUniqueId())/totalHP;
     }
 
     public Location getLocation() {

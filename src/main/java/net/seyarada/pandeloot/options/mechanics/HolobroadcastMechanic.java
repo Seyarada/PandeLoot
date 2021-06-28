@@ -4,7 +4,7 @@ import net.mystipvp.holobroadcast.holograms.HologramPlayer;
 import net.mystipvp.holobroadcast.holograms.HologramPlayersManager;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.options.MechanicEvent;
-import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.rewards.Reward;
 import org.bukkit.Bukkit;
 
 public class HolobroadcastMechanic implements MechanicEvent {

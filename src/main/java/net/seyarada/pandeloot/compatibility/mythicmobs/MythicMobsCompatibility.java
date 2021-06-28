@@ -18,12 +18,11 @@ import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.damage.MobOptions;
-import net.seyarada.pandeloot.drops.Manager;
 import net.seyarada.pandeloot.drops.StartDrops;
 import net.seyarada.pandeloot.nms.NMSManager;
-import net.seyarada.pandeloot.options.Reward;
-import net.seyarada.pandeloot.rewards.RewardLineNew;
+import net.seyarada.pandeloot.rewards.Reward;
 import net.seyarada.pandeloot.utils.ChatUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -85,8 +84,12 @@ public class MythicMobsCompatibility implements Listener {
         List<String> strings = e.getMobType().getConfig().getStringList("Rewards");
 
         DamageUtil damageUtil = new DamageUtil(mob);
-        if(e.getKiller() instanceof Player) damageUtil.lastHit = (Player) e.getKiller();
-        new StartDrops(Arrays.asList(damageUtil.getPlayers()), strings, damageUtil, e.getEntity().getLocation());
+        if(e.getKiller() instanceof Player) damageUtil.lastHit = e.getKiller().getUniqueId();
+        List<Player> dropPlayers = new ArrayList<>();
+        for(UUID playerUUID : damageUtil.getPlayers()) {
+            dropPlayers.add(Bukkit.getPlayer(playerUUID));
+        }
+        new StartDrops(dropPlayers, strings, damageUtil, e.getEntity().getLocation());
 
         if(rank) ChatUtil.announceChatRank(damageUtil);
         if(score) NMSManager.spawnHologram(damageUtil);

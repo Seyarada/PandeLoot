@@ -3,7 +3,7 @@ package net.seyarada.pandeloot.options.mechanics;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.compatibility.MMOCoreCompatibility;
 import net.seyarada.pandeloot.options.MechanicEvent;
-import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.rewards.Reward;
 
 public class MMOCoreExperienceMechanic implements MechanicEvent {
     @Override

@@ -2,14 +2,23 @@ package net.seyarada.pandeloot.utils;
 
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ChatUtil {
 
     public static void announceChatRank(DamageUtil damageUtil) {
-        Player[] players = damageUtil.getPlayers();
-        for(Player player : players) {
+        List<Player> dropPlayers = new ArrayList<>();
+        for(UUID playerUUID : damageUtil.getPlayers()) {
+            dropPlayers.add(Bukkit.getPlayer(playerUUID));
+        }
+
+        for(Player player : dropPlayers) {
             for (String i : Config.getScoreMessage()) {
                 i = PlaceholderUtil.parse(i, damageUtil, player, false);
                 if (i != null)

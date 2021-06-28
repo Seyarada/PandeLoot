@@ -3,7 +3,6 @@ package net.seyarada.pandeloot.utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.seyarada.pandeloot.Boosts;
 import net.seyarada.pandeloot.PandeLoot;
-import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -41,7 +40,7 @@ public class PlaceholderUtil {
                     int k = j + 1;
                     if(damageUtil.getRankedPlayers().size()>=k) {
                         i = fastReplace(i, "%"+k+".name%", damageUtil.getPlayer(j).getName());
-                        i = fastReplace(i, "%"+k+".dmg%", String.valueOf(damageUtil.getDamage(j)));
+                        i = fastReplace(i, "%"+k+".dmg%", String.valueOf(damageUtil.getDamage(j)).replace(".0", ""));
                     } else if(i.contains("%"+k+".name%") || i.contains("%"+k+".dmg%")) {
                         return null;
                     }
@@ -49,10 +48,10 @@ public class PlaceholderUtil {
 
                 if(i.contains("%player.")) {
                     DecimalFormat df = new DecimalFormat("#.##");
-                    i = fastReplace(i, "%player.dmg%", String.valueOf(df.format(damageUtil.getPlayerDamage(player))));
-                    i = fastReplace(i, "%player.pdmg%", String.valueOf(df.format(damageUtil.getPercentageDamage(player))));
-                    i = fastReplace(i, "%player.pdmg100%", String.valueOf(df.format(damageUtil.getPercentageDamage(player)*100)));
-                    i = fastReplace(i, "%player.rank%", df.format(damageUtil.getPlayerRank(player)));
+                    i = fastReplace(i, "%player.dmg%", df.format(damageUtil.getPlayerDamage(player)).replace(",", ".").replace(".0", ""));
+                    i = fastReplace(i, "%player.pdmg%", df.format(damageUtil.getPercentageDamage(player)).replace(",", ".")).replace(".0", "");
+                    i = fastReplace(i, "%player.pdmg100%", df.format(damageUtil.getPercentageDamage(player) * 100).replace(",", ".").replace(".0", ""));
+                    i = fastReplace(i, "%player.rank%", df.format(damageUtil.getPlayerRank(player)).replace(",", "."));
                 }
             }
         }
@@ -60,16 +59,16 @@ public class PlaceholderUtil {
         if(damageUtil!=null) {
             if(i.contains("%mob.")) {
                 i = fastReplace(i, "%mob.name%", damageUtil.getEntityName());
-                i = fastReplace(i, "%mob.hp%", String.valueOf(damageUtil.getEntityHealth()));
+                i = fastReplace(i, "%mob.hp%", String.valueOf(damageUtil.getEntityHealth())).replace(".0", "");
             }
 
             if(damageUtil.lastHit!=null && i.contains("%lasthit")) {
                 DecimalFormat df = new DecimalFormat("#.##");
-                i = fastReplace(i, "%lasthit%", damageUtil.lastHit.getName());
-                i = fastReplace(i, "%lasthit.dmg%", String.valueOf(df.format(damageUtil.getPlayerDamage(damageUtil.lastHit))));
-                i = fastReplace(i, "%lasthit.pdmg%", String.valueOf(df.format(damageUtil.getPercentageDamage(damageUtil.lastHit))));
-                i = fastReplace(i, "%lasthit.pdmg100%", String.valueOf(df.format(damageUtil.getPercentageDamage(damageUtil.lastHit) * 100)));
-                i = fastReplace(i, "%lasthit.rank%", df.format(damageUtil.getPlayerRank(damageUtil.lastHit)));
+                i = fastReplace(i, "%lasthit%", damageUtil.getLasthit().getName());
+                i = fastReplace(i, "%lasthit.dmg%", df.format(damageUtil.getPlayerDamage(damageUtil.getLasthit())).replace(",", ".").replace(".0", ""));
+                i = fastReplace(i, "%lasthit.pdmg%", df.format(damageUtil.getPercentageDamage(damageUtil.getLasthit())).replace(",", ".").replace(".0", ""));
+                i = fastReplace(i, "%lasthit.pdmg100%", String.valueOf(df.format(damageUtil.getPercentageDamage(damageUtil.getLasthit()) * 100)).replace(",", ".").replace(".0", ""));
+                i = fastReplace(i, "%lasthit.rank%", df.format(damageUtil.getPlayerRank(damageUtil.getLasthit())).replace(",", "."));
             }
         }
 

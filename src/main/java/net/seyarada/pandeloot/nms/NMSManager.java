@@ -1,9 +1,14 @@
 package net.seyarada.pandeloot.nms;
 
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.rewards.Reward;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 public class NMSManager {
 
@@ -116,6 +121,36 @@ public class NMSManager {
                 V1_14_R1.spawnHologram(damageUtil); break;
             case "v1_13_R2":
                 V1_13_R2.spawnHologram(damageUtil); break;
+        }
+    }
+
+    public static void spawnLockedHologram(Entity toTrack, Location location, List<String> toDisplay, List<Player> players, int aT, Reward reward) {
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        switch (version) {
+            case "v1_16_R3":
+                new V1_16_R3().spawnLockedHologram(toTrack, location, toDisplay, players, aT, reward); break;
+            case "v1_16_R2":
+                new V1_16_R2().spawnLockedHologram(toTrack, location, toDisplay, players, aT, reward); break;
+            case "v1_16_R1":
+                new V1_16_R1().spawnLockedHologram(toTrack, location, toDisplay, players, aT, reward); break;
+            case "v1_15_R1":
+                new V1_15_R1().spawnLockedHologram(toTrack, location, toDisplay, players, aT, reward); break;
+            case "v1_14_R1":
+                new V1_14_R1().spawnLockedHologram(toTrack, location, toDisplay, players, aT, reward); break;
+            case "v1_13_R2":
+                new V1_13_R2().spawnLockedHologram(toTrack, location, toDisplay, players, aT, reward); break;
+        }
+    }
+
+    public static void toast(Player player, String title, String frame, ItemStack icon) {
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        switch (version) {
+            case "v1_16_R3":
+                V1_16_R3.displayToast(player, title, frame, icon); break;
+            case "v1_16_R2":
+                V1_16_R2.displayToast(player, title, frame, icon); break;
+            case "v1_16_R1":
+                V1_16_R1.displayToast(player, title, frame, icon); break;
         }
     }
 

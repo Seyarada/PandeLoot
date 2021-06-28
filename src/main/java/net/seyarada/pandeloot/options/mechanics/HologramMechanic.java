@@ -1,9 +1,9 @@
 package net.seyarada.pandeloot.options.mechanics;
 
 import net.seyarada.pandeloot.StringLib;
+import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.options.MechanicEvent;
-import net.seyarada.pandeloot.options.Reward;
-import net.seyarada.pandeloot.schedulers.LockedHologram;
+import net.seyarada.pandeloot.rewards.Reward;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,14 +30,14 @@ public class HologramMechanic implements MechanicEvent {
                 case "DISPLAY":
                     List<String> display = getItemDisplay(item);
                     if(display==null) break;
-                    new LockedHologram(item, display, player, abandonTime, reward);
+                    NMSManager.spawnLockedHologram(item, item.getLocation(), display, Collections.singletonList(player), abandonTime, reward);
                     break;
                 case "lore":
                 case "Lore":
                 case "LORE":
                     List<String> lore = getItemLore(item);
                     if(!lore.isEmpty())
-                        new LockedHologram(item, lore, player, abandonTime, reward);
+                        NMSManager.spawnLockedHologram(item, item.getLocation(), lore, Collections.singletonList(player), abandonTime, reward);
                     break;
                 case "full":
                 case "Full":
@@ -46,14 +46,14 @@ public class HologramMechanic implements MechanicEvent {
                     lore = getItemLore(item);
                     if(lore==null) lore = new ArrayList<>();
                     lore.addAll(display);
-                    new LockedHologram(item, lore, player, abandonTime, reward);
+                    NMSManager.spawnLockedHologram(item, item.getLocation(), lore, Collections.singletonList(player), abandonTime, reward);
                     break;
                 default:
                     List<String> entries = Arrays.asList(hologram.split(","));
-                    new LockedHologram(item, entries, player, abandonTime, reward);
+                    NMSManager.spawnLockedHologram(item, item.getLocation(), entries, Collections.singletonList(player), abandonTime, reward);
             }
         } else if(abandonTime>0) {
-            new LockedHologram(reward.item, new ArrayList<>(), reward.player, abandonTime, reward);
+            NMSManager.spawnLockedHologram(reward.item, reward.item.getLocation(), new ArrayList<>(), Collections.singletonList(reward.player), abandonTime, reward);
         }
     }
 

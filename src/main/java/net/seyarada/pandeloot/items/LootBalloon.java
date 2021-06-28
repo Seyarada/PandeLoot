@@ -2,9 +2,9 @@ package net.seyarada.pandeloot.items;
 
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.drops.Manager;
-import net.seyarada.pandeloot.options.Reward;
-import net.seyarada.pandeloot.rewards.RewardContainerNew;
-import net.seyarada.pandeloot.rewards.RewardLineNew;
+import net.seyarada.pandeloot.rewards.Reward;
+import net.seyarada.pandeloot.rewards.RewardContainer;
+import net.seyarada.pandeloot.rewards.RewardLine;
 import net.seyarada.pandeloot.schedulers.BalloonScheduler;
 import net.seyarada.pandeloot.utils.MathUtil;
 import org.bukkit.Bukkit;
@@ -23,9 +23,9 @@ import java.util.*;
 
 import static net.seyarada.pandeloot.items.ItemUtils.collectRewards;
 
-public class LootBalloon extends RewardContainerNew implements Listener {
+public class LootBalloon extends RewardContainer implements Listener {
 
-    final public static Map<UUID, RewardContainerNew> balloonRegistry = new HashMap<>();
+    final public static Map<UUID, RewardContainer> balloonRegistry = new HashMap<>();
     final public static Map<UUID, UUID> leashRegistry = new HashMap<>();
     final public static Map<UUID, UUID> headRegistry = new HashMap<>();
 
@@ -92,9 +92,9 @@ public class LootBalloon extends RewardContainerNew implements Listener {
 
     public void explodeBalloon(Player player, Location location) {
         StringLib.warn("+ Doing drop for lootBalloon "+internalName);
-        List<RewardLineNew> drops = getDrops();
+        List<RewardLine> drops = getDrops();
         StringLib.warn("+++ Got for the balloon drop: ");
-        for(RewardLineNew drop : drops) {
+        for(RewardLine drop : drops) {
             StringLib.warn("++++ "+drop.baseLine);
         }
         final List<Reward> baseRewards = reward.createNewRewards(drops);

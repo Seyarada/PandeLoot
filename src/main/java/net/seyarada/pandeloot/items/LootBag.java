@@ -5,12 +5,12 @@ import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.drops.Manager;
 import net.seyarada.pandeloot.nms.NMSManager;
-import net.seyarada.pandeloot.options.Reward;
-import net.seyarada.pandeloot.rewards.RewardContainerNew;
-import net.seyarada.pandeloot.rewards.RewardLineNew;
+import net.seyarada.pandeloot.rewards.Reward;
+import net.seyarada.pandeloot.rewards.RewardContainer;
+import net.seyarada.pandeloot.rewards.RewardLine;
+import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import static net.seyarada.pandeloot.items.ItemUtils.collectRewards;
 
-public class LootBag extends RewardContainerNew {
+public class LootBag extends RewardContainer {
 
     public static List<UUID> openedBags = new ArrayList<>();
 
@@ -38,10 +38,10 @@ public class LootBag extends RewardContainerNew {
         openedBags.add(item.getUniqueId());
 
         StringLib.warn("+ Doing ground drop for lootbag "+internalName+", from "+item.getUniqueId());
-        List<RewardLineNew> drops = getDrops();
+        List<RewardLine> drops = getDrops();
 
         StringLib.warn("+++ Got for the ground drop: ");
-        for(RewardLineNew drop : drops) {
+        for(RewardLine drop : drops) {
             StringLib.warn("++++ "+drop.baseLine);
         }
         final List<Reward> baseRewards = reward.createNewRewards(drops);
@@ -94,7 +94,7 @@ public class LootBag extends RewardContainerNew {
 
         ItemStack itemStack = new ItemStack(Material.valueOf(material.toUpperCase()), 1);
         ItemMeta meta = itemStack.getItemMeta();
-        meta.setDisplayName(display);
+        meta.setDisplayName(PlaceholderUtil.parse(display));
         meta.setCustomModelData(model);
         itemStack.setItemMeta(meta);
 

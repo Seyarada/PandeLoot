@@ -1,16 +1,16 @@
 package net.seyarada.pandeloot.rewards;
 
-import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
-public class RewardLineNew {
+public class RewardLine {
 
 
     final int optionsStartIndex;
@@ -28,7 +28,7 @@ public class RewardLineNew {
     public int amount = 1;
     public boolean skipConditions;
 
-    public RewardLineNew(String baseLine) {
+    public RewardLine(String baseLine) {
         this.baseLine = baseLine;
         optionsStartIndex = baseLine.indexOf("{");
         optionsEndIndex = baseLine.lastIndexOf("}");
@@ -40,14 +40,8 @@ public class RewardLineNew {
 
     public void build(Player player, DamageUtil util) {
         final String parsedBaseLine = PlaceholderUtil.parse(baseLine, util, player, false);
-
-
-
-        //System.err.println(parsedBaseLine);
         generateOutsideOptions(parsedBaseLine);
         generateInsideOptions(parsedBaseLine);
-        //System.err.print(insideOptions.toString());
-        //doPostProcessing();
     }
 
     public double getChance(DamageUtil u, Player p) {
@@ -61,20 +55,11 @@ public class RewardLineNew {
         return newChance;
     }
 
-    public static List<RewardLineNew> StringListToRewardList(List<String> strings) {
-        return strings.stream()
-                .map(RewardLineNew::new)
-                .collect(Collectors.toList());
-    }
-
     private String setOrigin() {
         if(originIndicatorIndex==-1) // diamond{...}
             return "minecraft";
         if(optionsStartIndex==-1 || originIndicatorIndex<optionsStartIndex) // minecraft:diamond || minecraft:diamond{...}
             return baseLine.substring(0,originIndicatorIndex);
-        //if(optionsStartIndex<originIndicatorIndex) // diamond{message=:}
-
-        // diamond{message=:}
         return "minecraft";
     }
 
@@ -102,10 +87,14 @@ public class RewardLineNew {
     }
 
     public void generateInsideOptions(String baseLine) {
-        if(optionsStartIndex==-1||optionsEndIndex==-1) return;
-
-        final String[] options = baseLine.substring(optionsStartIndex+1, optionsEndIndex).split(";");
+        int aStart = baseLine.indexOf("{");
+        int aEnd = baseLine.lastIndexOf("}");
+        if(aStart==-1||aEnd==-1) return;
+        StringLib.warn("+++ BaseLine "+ baseLine);
+        final String[] options = baseLine.substring(aStart+1, aEnd).split(";");
+        StringLib.warn("++++ Options for generateInside are "+ Arrays.toString(options));
         for(String option : options) {
+            StringLib.warn("+++++ Option is "+ option);
             final String[] l = option.split("=");
             final String optionKey = l[0].toLowerCase();
             final String optionValue = l[1];
@@ -115,8 +104,6 @@ public class RewardLineNew {
 
     private void generateOutsideOptions(String baseLine) {
         optionsEndIndex = baseLine.lastIndexOf("}");
-        //System.err.println(optionsEndIndex+1);
-        //System.err.println(baseLine.length());
         if(optionsEndIndex+1 >= baseLine.length()) return;
         if(!baseLine.contains(" ")) return;
 
@@ -126,17 +113,15 @@ public class RewardLineNew {
             baseLine = baseLine.substring(baseLine.indexOf(" ")+1);
 
 
-        //System.err.println(this.baseLine);
-        //System.err.println(baseLine);
-
-
         final String[] options = baseLine.split(" ");
         for(String option : options) {
 
             if(option.trim().isEmpty()) continue;
 
             if(option.startsWith("0.")) {
-                chance = parseOutsideOption(option); continue; }
+                chance = parseOutsideOption(option);
+                continue;
+            }
             if(option.contains("=") || option.contains(">") || option.contains("<")) {
                 damage = option; continue; }
 

@@ -11,7 +11,7 @@ import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.drops.Manager;
-import net.seyarada.pandeloot.rewards.RewardLineNew;
+import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -37,7 +37,7 @@ public class MythicMobsDrop extends Drop implements IMultiDrop, Listener {
         int k = i.lastIndexOf("}");
         i = i.substring(j, k);
 
-        RewardLineNew lineConfig = new RewardLineNew(i);
+        RewardLine lineConfig = new RewardLine(i);
         Location location = BukkitAdapter.adapt(metadata.getDropper().get().getLocation());
         Player p = (Player) BukkitAdapter.adapt(metadata.getCause().get());
 

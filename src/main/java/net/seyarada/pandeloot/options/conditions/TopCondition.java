@@ -1,10 +1,9 @@
 package net.seyarada.pandeloot.options.conditions;
 
-import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.options.ConditionEvent;
-import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.rewards.Reward;
 import org.bukkit.entity.Player;
 
 public class TopCondition implements ConditionEvent {

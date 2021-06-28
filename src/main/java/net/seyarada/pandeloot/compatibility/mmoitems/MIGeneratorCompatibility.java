@@ -11,7 +11,7 @@ import net.Indyuce.mmoitems.api.item.template.explorer.TypeFilter;
 import net.Indyuce.mmoitems.api.player.PlayerData;
 import net.Indyuce.mmoitems.api.player.RPGPlayer;
 import net.seyarada.pandeloot.StringLib;
-import net.seyarada.pandeloot.rewards.RewardLineNew;
+import net.seyarada.pandeloot.rewards.RewardLine;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ public class MIGeneratorCompatibility {
     private static final Random random = new Random();
 
 
-    public static ItemStack getItem(String item, RewardLineNew reward, Player player) {
+    public static ItemStack getItem(String item, RewardLine reward, Player player) {
         if(player==null || reward.specialOptions.isEmpty()) return MMOItemsCompatibility.getItem(item, reward, player);
 
         Map<String, String> handler = reward.specialOptions;

@@ -5,7 +5,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.options.MechanicEvent;
-import net.seyarada.pandeloot.options.Reward;
+import net.seyarada.pandeloot.rewards.Reward;
 import org.bukkit.entity.Player;
 
 public class ActionbarMechanic implements MechanicEvent {

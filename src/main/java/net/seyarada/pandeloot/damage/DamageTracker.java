@@ -2,9 +2,6 @@ package net.seyarada.pandeloot.damage;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.seyarada.pandeloot.PandeLoot;
-import net.seyarada.pandeloot.StringLib;
-import net.seyarada.pandeloot.drops.StartDrops;
-import net.seyarada.pandeloot.items.LootBalloon;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -19,7 +16,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,14 +23,14 @@ import java.util.UUID;
 public class DamageTracker implements Listener {
 
     // Keeps track the damage dealt to a mob, the player and the amount
-    public static Map<UUID, Map<Player, Double>> damageTracker = new HashMap<>();
+    public static Map<UUID, Map<UUID, Double>> damageTracker = new HashMap<>();
     // damageMap.containsKey(playerName)
 
     // Stores the mobs registered as mobs that should have the damage tracked
     public static Map<UUID, MobOptions> loadedMobs = new HashMap<>();
 
 
-    public static Map<UUID, Player> lastHits = new HashMap<>();
+    public static Map<UUID, UUID> lastHits = new HashMap<>();
 
     public static void addPlayerDamage(UUID mob, Player player, Double damage) {
         if(PandeLoot.getInstance().getServer().getPluginManager().getPlugin("Citizens")!=null) {
@@ -44,35 +40,35 @@ public class DamageTracker implements Listener {
         Entity entity = Bukkit.getEntity(mob);
         if( entity!=null && ((LivingEntity) entity ).getHealth() < damage ) {
             damage = ((LivingEntity) entity).getHealth();
-            lastHits.put(mob, player);
+            lastHits.put(mob, player.getUniqueId());
         }
 
         // Creates the map if it doesn't exists
         if(!damageTracker.containsKey(mob)) {
-            HashMap<Player, Double> damageMap = new HashMap<>();
-            damageMap.put(player, damage);
+            HashMap<UUID, Double> damageMap = new HashMap<>();
+            damageMap.put(player.getUniqueId(), damage);
             // Creates a new entry in the hashmap with the player and damage
             damageTracker.put(mob, damageMap);
             return;
         }
 
         // Gets the damage map of the entity
-        Map<Player, Double> damageMap = damageTracker.get(mob);
+        Map<UUID, Double> damageMap = damageTracker.get(mob);
 
         // Checks if the entity already has that player mapped
-        if (damageMap.containsKey(player)) {
+        if (damageMap.containsKey(player.getUniqueId())) {
             // Updates the map to add the new damage
-            damageMap.put(player, damageMap.get(player) + damage);
+            damageMap.put(player.getUniqueId(), damageMap.get(player.getUniqueId()) + damage);
         } else {
             // Creates a new entry in the hashmap with the player and damage
-            damageMap.put(player, damage);}
+            damageMap.put(player.getUniqueId(), damage);}
 
         // Pushes the data to the main hashmap
         damageTracker.put(mob, damageMap);
 
     }
 
-    public static Map<Player, Double> get(UUID uuid) {
+    public static Map<UUID, Double> get(UUID uuid) {
         return damageTracker.get(uuid);
     }
 
@@ -113,18 +109,18 @@ public class DamageTracker implements Listener {
     public void remove(Player player) {
 
         for(UUID uuid : damageTracker.keySet())  {
-            Map<Player, Double> map = damageTracker.get(uuid);
+            Map<UUID, Double> map = damageTracker.get(uuid);
             MobOptions mobOptions;
 
             if(loadedMobs.containsKey(uuid))
                 mobOptions = loadedMobs.get(uuid);
             else continue;
 
-            if(map.containsKey(player)) {
+            if(map.containsKey(player.getUniqueId())) {
 
                 if(mobOptions.resetPlayers) {
-                    Double playerDamage = map.get(player);
-                    map.remove(player);
+                    Double playerDamage = map.get(player.getUniqueId());
+                    map.remove(player.getUniqueId());
                     if(mobOptions.resetHeal) {
                         LivingEntity a = ((LivingEntity) Bukkit.getEntity(uuid));
                         if(a!=null) {

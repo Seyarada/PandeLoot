@@ -3,15 +3,14 @@ package net.seyarada.pandeloot.rewards;
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.options.Conditions;
-import net.seyarada.pandeloot.options.Reward;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.stream.Collectors;
 
-public class RewardContainerNew {
+public class RewardContainer {
 
     public ConfigurationSection rewardContainer;
     public List<String> rewards;
@@ -26,9 +25,8 @@ public class RewardContainerNew {
     int rewardSize;
 
     int goalAmount;
-    int droppedAmount;
 
-    public RewardContainerNew(String internalName, Reward reward) {
+    public RewardContainer(String internalName, Reward reward) {
         if(internalName==null) {
             StringLib.warn("+ NULL REWARD CONTAINER CREATED");
             return;
@@ -55,47 +53,66 @@ public class RewardContainerNew {
     }
 
     private int generateGoalAmount() {
-        if (totalItems > 0) return totalItems;
-
-        final Random r = new Random();
-        if (minItems > 0 && maxItems > 0) return r.nextInt(maxItems - minItems + 1) + minItems;
-        if (minItems > 0)                 return r.nextInt(rewardSize - minItems + 1) + minItems;
-        return 0;
+        return Math.max(totalItems, Math.max(minItems, maxItems));
     }
 
-    public List<RewardLineNew> getDrops() {
-        final List<RewardLineNew> drops = new ArrayList<>();
+    public List<RewardLine> getDrops() {
+        final List<RewardLine> drops = new ArrayList<>();
 
         if(goalAmount>0) {
-            final List<RewardLineNew> items = getRawDropsParsingConditions(true);
+            final List<RewardLine> items = getRawDropsParsingConditions(false);
+            final List<RewardLine> itemsIgnoreChance = getRawDropsParsingConditions(true);
+            final List<String> recurrentBaseLines = itemsIgnoreChance.stream().map(rL -> rL.baseLine).collect(Collectors.toList());
+            drops.addAll(items);
+
             StringLib.warn("+ Getting drops of goal amount");
-            while(droppedAmount<goalAmount && items.size()>0) {
-                RewardLineNew item = doRoll(items);                             // by item until it reaches the desired
-                if(item!=null)
+            while(minItems>0 && drops.size()<minItems) {
+                RewardLine item = doRoll(itemsIgnoreChance);
+                List<String> lS = new ArrayList<>();
+                for (RewardLine m : drops)
+                    lS.add(m.baseLine);
+                if(item!=null && Collections.frequency(lS, item.baseLine)<Collections.frequency(recurrentBaseLines, item.baseLine))
                     drops.add(item);
             }
+            while(maxItems>0 && drops.size()>maxItems) {
+                drops.remove(0);
+            }
+            while(totalItems>0 && drops.size()!=totalItems) {
+                if(drops.size()<totalItems) {
+                    RewardLine item = doRoll(itemsIgnoreChance);
+                    List<String> lS = new ArrayList<>();
+                    for (RewardLine m : drops)
+                        lS.add(m.baseLine);
+                    if(item!=null && Collections.frequency(lS, item.baseLine)<Collections.frequency(recurrentBaseLines, item.baseLine))
+                        drops.add(item);
+                }
+                else {
+                    drops.remove(0);
+                }
+            }
         } else if(guaranteedItems>0) {
-            final List<RewardLineNew> items = getRawDropsParsingConditions(true);
+            final List<RewardLine> items = getRawDropsParsingConditions(false);
+            final List<RewardLine> itemsIgnoreChance = getRawDropsParsingConditions(true);
+            drops.addAll(items);
             StringLib.warn("+ Getting drops of guaranteed");
-            while(drops.size()<guaranteedItems && items.size()>0) {
-                RewardLineNew item = doRoll(items);
+            while(drops.size()<guaranteedItems && itemsIgnoreChance.size()>0) {
+                RewardLine item = doRoll(itemsIgnoreChance);
                 List<String> lS = new ArrayList<>();
-                for (RewardLineNew m : drops) {
+                for (RewardLine m : drops) {
                     lS.add(m.baseLine);
                 }
                 if(item!=null&&!lS.contains(item.baseLine))
                     drops.add(item);
             }
         } else {
-            final List<RewardLineNew> items = getRawDropsParsingConditions(false);
+            final List<RewardLine> items = getRawDropsParsingConditions(false);
             StringLib.warn("+ Getting all drops");
             drops.addAll(items);
         }
-        droppedAmount = 0; // Resets the amount in case this lootTable gets called again
         return drops;
     }
 
-    public static void addRewardContainerOptions(RewardLineNew rewardLine, ConfigurationSection rewardContainer) {
+    public static void addRewardContainerOptions(RewardLine rewardLine, ConfigurationSection rewardContainer) {
         if(rewardContainer==null) {
             StringLib.warn("++++++ RewardContainer is null, skipping");
             return;
@@ -134,13 +151,15 @@ public class RewardContainerNew {
         }
     }
 
-    private RewardLineNew doRoll(List<RewardLineNew> items) {
+    private RewardLine doRoll(List<RewardLine> items) {
         if(items.size()==0) return null;
 
         // Compute the total weight of all items together.
-        RewardLineNew[] rollItems = items.toArray(new RewardLineNew[0]);
+        RewardLine[] rollItems = items.toArray(new RewardLine[0]);
         double totalWeight = 0.0;
-        for (RewardLineNew i : items) {
+        for (RewardLine i : items) {
+            i.build(reward.player, reward.damageUtil);
+            StringLib.warn("+ Weight of "+i.baseLine+" is "+i.getChance(reward.damageUtil, reward.player));
             totalWeight += i.getChance(reward.damageUtil, reward.player);
         }
 
@@ -150,20 +169,19 @@ public class RewardContainerNew {
             r -= rollItems[idx].getChance(reward.damageUtil, reward.player);
             if (r <= 0.0) break;
         }
-        droppedAmount++;
 
         items.remove(idx); // Makes sure there isn't any repeated
 
-        RewardLineNew item = rollItems[idx];
+        RewardLine item = rollItems[idx];
         item.skipConditions = true;
         return item;
     }
 
 
-    private List<RewardLineNew> getRawDrops() {
-        List<RewardLineNew> drops = new ArrayList<>();
+    private List<RewardLine> getRawDrops() {
+        List<RewardLine> drops = new ArrayList<>();
         for (String rewardString : rewards) {
-            RewardLineNew rewardLine = new RewardLineNew(rewardString);
+            RewardLine rewardLine = new RewardLine(rewardString);
             rewardLine.build(reward.player, reward.damageUtil);
             addRewardContainerOptions(rewardLine, rewardContainer);
             drops.add(rewardLine);
@@ -171,9 +189,9 @@ public class RewardContainerNew {
         return drops;
     }
 
-    private List<RewardLineNew> getRawDropsParsingConditions(boolean ignoreChance) {
-        List<RewardLineNew> drops = new ArrayList<>();
-        List<RewardLineNew> rewardLines = getRawDrops();
+    private List<RewardLine> getRawDropsParsingConditions(boolean ignoreChance) {
+        List<RewardLine> drops = new ArrayList<>();
+        List<RewardLine> rewardLines = getRawDrops();
 
         List<Reward> rewardsList = reward.createNewRewards(rewardLines);
         if(ignoreChance) {

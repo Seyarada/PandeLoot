@@ -1,7 +1,7 @@
 package net.seyarada.pandeloot.commands;
 
 import net.seyarada.pandeloot.StringLib;
-import net.seyarada.pandeloot.drops.Manager;
+import net.seyarada.pandeloot.drops.StartDrops;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -31,7 +31,9 @@ public class GiveCommand {
             if (i > 0) sb.append(" ");
             sb.append(args[2+i]);
         }
-        new Manager().fromString(Collections.singletonList(player), Collections.singletonList(sb.toString()), null, null);
+
+        new StartDrops(Collections.singletonList(player), Collections.singletonList(sb.toString()), null, null);
+        //new Manager().fromString(Collections.singletonList(player), Collections.singletonList(sb.toString()), null, null);
 
         return true;
     }

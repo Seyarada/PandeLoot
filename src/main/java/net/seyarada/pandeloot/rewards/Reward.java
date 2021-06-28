@@ -1,4 +1,4 @@
-package net.seyarada.pandeloot.options;
+package net.seyarada.pandeloot.rewards;
 
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.StringLib;
@@ -9,18 +9,19 @@ import net.seyarada.pandeloot.compatibility.mmoitems.MMOItemsCompatibility;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.items.LootBag;
-import net.seyarada.pandeloot.rewards.RewardLineNew;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Reward {
 
-    final public RewardLineNew rewardLine;
+    final public RewardLine rewardLine;
     public Player player;
     final public DamageUtil damageUtil;
 
@@ -35,7 +36,7 @@ public class Reward {
     public int radialOrder;
     public int skip;
 
-    public Reward(RewardLineNew line, Player player, DamageUtil util) {
+    public Reward(RewardLine line, Player player, DamageUtil util) {
         line.build(player, util);
 
         this.rewardLine = line;
@@ -100,30 +101,30 @@ public class Reward {
         return options.get(option);
     }
 
-    public List<Reward> createNewRewards(List<RewardLineNew> rewardLines) {
+    public List<Reward> createNewRewards(List<RewardLine> rewardLines) {
         List<Reward> rewards = new ArrayList<>();
-        for(RewardLineNew rewardLine : rewardLines) {
+        for(RewardLine rewardLine : rewardLines) {
             rewards.add(new Reward(rewardLine, player, damageUtil));
         }
         return rewards;
     }
 
-    public static List<Reward> createNewRewards(List<RewardLineNew> rewardLines, Player player, DamageUtil damageUtil) {
+    public static List<Reward> createNewRewards(List<RewardLine> rewardLines, Player player, DamageUtil damageUtil) {
         List<Reward> rewards = new ArrayList<>();
-        for(RewardLineNew rewardLine : rewardLines) {
+        for(RewardLine rewardLine : rewardLines) {
             rewards.add(new Reward(rewardLine, player, damageUtil));
         }
         return rewards;
     }
 
     public Reward createNewReward(String baseLine) {
-        return new Reward(new RewardLineNew(baseLine), player, damageUtil);
+        return new Reward(new RewardLine(baseLine), player, damageUtil);
     }
 
     public static List<Reward> rewardsFromStringList(List<String> stringRewardsList, Player player, DamageUtil damageUtil) {
         List<Reward> rewards = new ArrayList<>();
         for(String stringReward : stringRewardsList) {
-            RewardLineNew rewardLine = new RewardLineNew(stringReward);
+            RewardLine rewardLine = new RewardLine(stringReward);
             Reward reward = new Reward(rewardLine, player, damageUtil);
             rewards.add(reward);
         }

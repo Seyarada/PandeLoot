@@ -1,6 +1,7 @@
 package net.seyarada.pandeloot.options;
 
 import net.seyarada.pandeloot.StringLib;
+import net.seyarada.pandeloot.rewards.Reward;
 
 import java.util.*;
 

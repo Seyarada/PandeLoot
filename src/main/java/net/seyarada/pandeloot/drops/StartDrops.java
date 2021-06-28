@@ -1,13 +1,11 @@
 package net.seyarada.pandeloot.drops;
 
-import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.items.ItemUtils;
 import net.seyarada.pandeloot.options.Options;
-import net.seyarada.pandeloot.options.Reward;
-import org.bukkit.ChatColor;
+import net.seyarada.pandeloot.rewards.Reward;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,13 +17,14 @@ import java.util.Map;
 
 public class StartDrops {
 
-    private List<Player> players;
-    private int delay;
-
     public StartDrops(List<Player> players, List<String> rewardStrings, DamageUtil damageUtil, Location location) {
-        this.players = players;
-
         StringLib.warn("+++ Started drop starter");
+
+        if(players==null) {
+            final List<Reward> rewards = Reward.rewardsFromStringList(rewardStrings, null, damageUtil);
+            perEntryDrop(rewards, location, rewardStrings);
+            return;
+        }
 
         for(Player player : players) {
             StringLib.warn("++++ Doing drop for: "+player.getName());
@@ -60,6 +59,8 @@ public class StartDrops {
         StringLib.warn("+++ Starting good drop loop");
 
         for(Reward reward : rewards) {
+
+            playerDelay += Integer.parseInt(reward.options.get("delay"));
 
             StringLib.warn("+++ Doing drop for "+reward.rewardLine.baseLine);
 
@@ -100,8 +101,6 @@ public class StartDrops {
             reward.radialDropInformation = radialCounter;
             reward.radialOrder = radialCounter.get(explodeRadius)+1;
         }
-
-        playerDelay += Integer.parseInt(reward.get("delay"));
 
         new BukkitRunnable() {
             @Override

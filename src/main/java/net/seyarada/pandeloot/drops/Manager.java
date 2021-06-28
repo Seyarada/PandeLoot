@@ -1,13 +1,12 @@
 package net.seyarada.pandeloot.drops;
 
-import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageUtil;
 import net.seyarada.pandeloot.items.ItemUtils;
 import net.seyarada.pandeloot.options.Options;
-import net.seyarada.pandeloot.options.Reward;
-import net.seyarada.pandeloot.rewards.RewardLineNew;
+import net.seyarada.pandeloot.rewards.Reward;
+import net.seyarada.pandeloot.rewards.RewardLine;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -37,7 +36,7 @@ public class Manager {
         }
     }
 
-    public void fromRewardLine(List<Player> players, List<RewardLineNew> rewardLines, DamageUtil damageUtil, Location location) {
+    public void fromRewardLine(List<Player> players, List<RewardLine> rewardLines, DamageUtil damageUtil, Location location) {
         this.players = players;
 
         for(Player player : players) {
@@ -70,7 +69,20 @@ public class Manager {
 
         StringLib.warn("+++ Starting wrong drop loop");
 
+        // This solution is bad and ugly
         for(Reward reward : playerDrops) {
+            final String explodeRadiusString = reward.get("exploderadius");
+            if(explodeRadiusString!=null) {
+                StringLib.warn("++++ Assigning explode radius order");
+                final double explodeRadius = Double.parseDouble(explodeRadiusString);
+                radialCounter.put(explodeRadius, radialCounter.getOrDefault(explodeRadius,0)+1);
+                reward.radialOrder = radialCounter.get(explodeRadius);
+            }
+        }
+
+        for(Reward reward : playerDrops) {
+
+            playerDelay += Integer.parseInt(reward.options.get("delay"));
 
             StringLib.warn("+++ Doing drop for "+reward.rewardLine.baseLine);
 
@@ -102,21 +114,12 @@ public class Manager {
 
         final String explodeRadiusString = reward.get("exploderadius");
         if(explodeRadiusString!=null) {
-            StringLib.warn("++++ Assigning explode radius order");
-            final double explodeRadius = Double.parseDouble(explodeRadiusString);
-
-            radialCounter.put(explodeRadius, radialCounter.containsKey(explodeRadius)
-                    ? radialCounter.get(explodeRadius) + 1
-                    : 1);
-
             reward.radialDropInformation = radialCounter;
-            reward.radialOrder = radialCounter.get(explodeRadius)+1;
         }
 
-        playerDelay += Integer.parseInt(reward.get("delay"));
         StringLib.warn("++++ Delay is "+playerDelay);
 
-        if(delay<=0) {
+        if(playerDelay<=0) {
             StringLib.warn("++++ Spawning the reward and calling the options...");
             new SpawnReward(reward, location);
             Options.callOptions(reward);
