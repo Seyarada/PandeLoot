@@ -1,21 +1,25 @@
-package net.seyarada.pandeloot.nms;
+package net.seyarada.pandeloot.nms.v1_16_R1;
 
-import net.minecraft.server.v1_15_R1.*;
+import com.google.gson.JsonObject;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
+import net.minecraft.server.v1_16_R1.*;
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.options.Options;
 import net.seyarada.pandeloot.rewards.Reward;
 import net.seyarada.pandeloot.utils.MathUtil;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R1.util.CraftChatMessage;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,7 +27,7 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public class V1_15_R1 {
+public class V1_16_R1 {
 
     public static org.bukkit.inventory.ItemStack removeNBT(org.bukkit.inventory.ItemStack item, String key) {
         ItemStack removeNBT = CraftItemStack.asNMSCopy(item);
@@ -233,6 +237,7 @@ public class V1_15_R1 {
         armorStand.setCustomNameVisible(true);
         armorStand.setInvisible(true);
         armorStand.setMarker(true);
+        armorStand.setFireTicks(999999);
 
         if(display.contains("%time")) {
             abandonEntity = armorStand;
@@ -240,6 +245,71 @@ public class V1_15_R1 {
         }
 
         return armorStand;
+    }
+
+    public static void displayToast(Player player, String title, String frame, org.bukkit.inventory.ItemStack icon) {
+        MinecraftKey minecraftKey = new MinecraftKey("pandeloot", "notification");
+        HashMap<String, Criterion> criteria = new HashMap<>();
+
+        criteria.put("for_free",new Criterion(new CriterionInstance() {
+            public MinecraftKey a() {
+                return new MinecraftKey("minecraft","impossible");
+            }
+            @Override // Not needed
+            public JsonObject a(LootSerializationContext lootSerializationContext) { return null; }
+        }));
+
+        ArrayList<String[]> fixed = new ArrayList<>();
+        fixed.add(new String[]{"for_free"});
+
+        String[][] requirements = Arrays.stream(fixed.toArray()).toArray(String[][]::new);
+
+        IChatBaseComponent chatTitle = new ChatMessage(title);
+        //IChatBaseComponent chatDescription = new ChatMessage(description);
+        AdvancementFrameType advancementFrame = AdvancementFrameType.valueOf(frame.toUpperCase());
+        net.minecraft.server.v1_16_R1.ItemStack craftIcon = CraftItemStack.asNMSCopy(icon);
+
+        AdvancementDisplay display = new AdvancementDisplay(craftIcon, chatTitle, null, null, advancementFrame, true,true,true);
+        AdvancementRewards reward = new AdvancementRewards(0, new MinecraftKey[0], new MinecraftKey[0], null);
+        Advancement advancement = new Advancement(minecraftKey, null, display, reward, criteria, requirements);
+
+        HashMap<MinecraftKey,AdvancementProgress> progressMap = new HashMap<>();
+        AdvancementProgress progress = new AdvancementProgress();
+        progress.a(criteria,requirements);
+        progress.getCriterionProgress("for_free").b();
+        progressMap.put(minecraftKey,progress);
+
+        PacketPlayOutAdvancements packet
+                = new PacketPlayOutAdvancements(false, Collections.singletonList(advancement), new HashSet<>(), progressMap);
+        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(packet);
+
+        // Remove the advancement
+        HashSet<MinecraftKey> remove = new HashSet<>();
+        remove.add(minecraftKey);
+        progressMap.clear();
+        packet = new PacketPlayOutAdvancements(false, new ArrayList<>(), remove, progressMap);
+        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(packet);
+    }
+
+    public static void injectPlayer(Player player) {
+        EntityPlayer ply = ((CraftPlayer) player).getHandle();
+        PandeLootChannelHandler_v1_16_R1 cdh = new PandeLootChannelHandler_v1_16_R1(ply);
+
+        ChannelPipeline pipeline = ply.playerConnection.networkManager.channel.pipeline();
+        for(String name : pipeline.toMap().keySet()) {
+            if(pipeline.get(name) instanceof NetworkManager) {
+                pipeline.addBefore(name, "pande_loot_packet_handler", cdh);
+                break;
+            }
+        }
+    }
+
+    public static void removePlayer(Player player) {
+        Channel channel = ((CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
+        channel.eventLoop().submit(() -> {
+            channel.pipeline().remove("pande_loot_packet_handler");
+            return null;
+        });
     }
 
 }
