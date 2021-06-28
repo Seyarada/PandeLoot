@@ -1,33 +1,37 @@
-package net.seyarada.pandeloot.nms;
+package net.seyarada.pandeloot.nms.v1_14_R1;
 
-import net.minecraft.server.v1_13_R2.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
+import net.minecraft.server.v1_14_R1.*;
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.options.Options;
 import net.seyarada.pandeloot.rewards.Reward;
 import net.seyarada.pandeloot.utils.MathUtil;
 import net.seyarada.pandeloot.utils.PlaceholderUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_13_R2.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_14_R1.util.CraftChatMessage;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public class V1_13_R2 {
+public class V1_14_R1 {
 
     public static org.bukkit.inventory.ItemStack removeNBT(org.bukkit.inventory.ItemStack item, String key) {
         ItemStack removeNBT = CraftItemStack.asNMSCopy(item);
-        removeNBT.c(key);
+        removeNBT.removeTag(key);
         return (CraftItemStack.asBukkitCopy(removeNBT));
     }
 
@@ -80,7 +84,7 @@ public class V1_13_R2 {
 
                 msg = PlaceholderUtil.parse(msg, damageUtil, player, false);
 
-                final EntityArmorStand armorStand = new EntityArmorStand(wS);
+                final EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.ARMOR_STAND, wS);
                 armorStand.setPosition(lX, lY, lZ);
                 armorStand.setCustomName(CraftChatMessage.fromStringOrNull(msg));
                 armorStand.setCustomNameVisible(true);
@@ -171,7 +175,7 @@ public class V1_13_R2 {
 
                 if(abandonTime==0 && aT>0) {
                     Location aaLoc = toTrack.getLocation().clone();
-                    org.bukkit.inventory.ItemStack itemStack = ((org.bukkit.entity.Item) toTrack).getItemStack();
+                    org.bukkit.inventory.ItemStack itemStack = ((Item) toTrack).getItemStack();
                     itemStack = NMSManager.removeNBT(itemStack, StringLib.root);
 
                     toTrack.remove();
@@ -227,19 +231,39 @@ public class V1_13_R2 {
     private EntityArmorStand spawnPacketHologram(Location location, String display) {
         if(display==null || display.isEmpty()) return null;
         WorldServer wS = ((CraftWorld) location.getWorld()).getHandle();
-        final EntityArmorStand armorStand = new EntityArmorStand(wS);
+        final EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.ARMOR_STAND, wS);
         armorStand.setPosition(location.getX(), location.getY(), location.getZ());
         armorStand.setCustomName(CraftChatMessage.fromStringOrNull(display));
         armorStand.setCustomNameVisible(true);
         armorStand.setInvisible(true);
         armorStand.setMarker(true);
-
         if(display.contains("%time")) {
             abandonEntity = armorStand;
             timeText = display;
         }
 
         return armorStand;
+    }
+
+    public static void injectPlayer(Player player) {
+        EntityPlayer ply = ((CraftPlayer) player).getHandle();
+        PandeLootChannelHandler_v1_14_R1 cdh = new PandeLootChannelHandler_v1_14_R1(ply);
+
+        ChannelPipeline pipeline = ply.playerConnection.networkManager.channel.pipeline();
+        for(String name : pipeline.toMap().keySet()) {
+            if(pipeline.get(name) instanceof NetworkManager) {
+                pipeline.addBefore(name, "pande_loot_packet_handler", cdh);
+                break;
+            }
+        }
+    }
+
+    public static void removePlayer(Player player) {
+        Channel channel = ((CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
+        channel.eventLoop().submit(() -> {
+            channel.pipeline().remove("pande_loot_packet_handler");
+            return null;
+        });
     }
 
 }

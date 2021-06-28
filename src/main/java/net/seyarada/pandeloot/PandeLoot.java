@@ -5,6 +5,7 @@ import net.seyarada.pandeloot.commands.*;
 import net.seyarada.pandeloot.compatibility.mythicmobs.MythicMobsCompatibility;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.items.LootBalloon;
+import net.seyarada.pandeloot.nms.PlayerListener;
 import net.seyarada.pandeloot.options.RegisterOptions;
 import net.seyarada.pandeloot.rewards.RewardsListener;
 import org.bukkit.entity.ArmorStand;
@@ -35,6 +36,7 @@ public class PandeLoot extends JavaPlugin {
 
         this.getServer().getPluginManager().registerEvents(new DamageTracker(), this);
         this.getServer().getPluginManager().registerEvents(new RewardsListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
         this.getServer().getPluginManager().registerEvents(new LootBalloon(null, null), this);
 

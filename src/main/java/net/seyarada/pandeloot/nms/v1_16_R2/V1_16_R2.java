@@ -1,12 +1,15 @@
-package net.seyarada.pandeloot.nms;
+package net.seyarada.pandeloot.nms.v1_16_R2;
 
 import com.google.gson.JsonObject;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import net.minecraft.server.v1_16_R2.*;
 import net.seyarada.pandeloot.Config;
 import net.seyarada.pandeloot.PandeLoot;
 import net.seyarada.pandeloot.StringLib;
 import net.seyarada.pandeloot.damage.DamageTracker;
 import net.seyarada.pandeloot.damage.DamageUtil;
+import net.seyarada.pandeloot.nms.NMSManager;
 import net.seyarada.pandeloot.options.Options;
 import net.seyarada.pandeloot.rewards.Reward;
 import net.seyarada.pandeloot.utils.MathUtil;
@@ -287,6 +290,27 @@ public class V1_16_R2 {
         progressMap.clear();
         packet = new PacketPlayOutAdvancements(false, new ArrayList<>(), remove, progressMap);
         ((CraftPlayer)player).getHandle().playerConnection.sendPacket(packet);
+    }
+
+    public static void injectPlayer(Player player) {
+        EntityPlayer ply = ((CraftPlayer) player).getHandle();
+        PandeLootChannelHandler_v1_16_R2 cdh = new PandeLootChannelHandler_v1_16_R2(ply);
+
+        ChannelPipeline pipeline = ply.playerConnection.networkManager.channel.pipeline();
+        for(String name : pipeline.toMap().keySet()) {
+            if(pipeline.get(name) instanceof NetworkManager) {
+                pipeline.addBefore(name, "pande_loot_packet_handler", cdh);
+                break;
+            }
+        }
+    }
+
+    public static void removePlayer(Player player) {
+        Channel channel = ((CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
+        channel.eventLoop().submit(() -> {
+            channel.pipeline().remove("pande_loot_packet_handler");
+            return null;
+        });
     }
 
 }
