@@ -45,7 +45,7 @@ public class ItemUtils {
                     break;
                 case "droptable":
                 case "dt":
-                    if (Bukkit.getServer().getPluginManager().getPlugin("MythicMobs") == null) {
+                    if (Bukkit.getServer().getPluginManager().getPlugin("MythicMobs") != null) {
                         new UnpackDropTable(i, store);
                     }
                     StringLib.depthBonus--;

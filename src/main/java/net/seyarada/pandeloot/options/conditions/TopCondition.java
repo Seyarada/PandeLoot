@@ -36,7 +36,7 @@ public class TopCondition implements ConditionEvent {
         if(intTop>=0) {
             if(damageUtil.getRankedPlayers().size()>intTop) {
                 StringLib.warn("++++++++ Player at internal position "+intTop+ " is "+damageUtil.getRankedPlayers().get(intTop).getKey());
-                return damageUtil.getRankedPlayers().get(intTop).getKey().equals(player);
+                return damageUtil.getRankedPlayers().get(intTop).getKey() == player.getUniqueId();
             }
             StringLib.warn("++++++++ Player at internal position "+intTop+ " is not registered");
             return false;

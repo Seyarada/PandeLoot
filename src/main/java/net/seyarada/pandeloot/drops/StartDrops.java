@@ -27,6 +27,7 @@ public class StartDrops {
         }
 
         for(Player player : players) {
+            if(player==null||!player.isOnline()) continue;
             StringLib.warn("++++ Doing drop for: "+player.getName());
             final List<Reward> rewards = Reward.rewardsFromStringList(rewardStrings, player, damageUtil);
 

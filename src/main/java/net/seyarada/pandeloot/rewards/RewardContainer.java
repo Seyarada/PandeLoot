@@ -56,7 +56,7 @@ public class RewardContainer {
         return Math.max(totalItems, Math.max(minItems, maxItems));
     }
 
-    public List<RewardLine> getDrops() {
+    public List<RewardLine> getDrops() { ;
         final List<RewardLine> drops = new ArrayList<>();
 
         if(goalAmount>0) {
@@ -75,7 +75,7 @@ public class RewardContainer {
                     drops.add(item);
             }
             while(maxItems>0 && drops.size()>maxItems) {
-                drops.remove(0);
+                drops.remove((int)(Math.random() * drops.size()));
             }
             while(totalItems>0 && drops.size()!=totalItems) {
                 if(drops.size()<totalItems) {
@@ -87,7 +87,7 @@ public class RewardContainer {
                         drops.add(item);
                 }
                 else {
-                    drops.remove(0);
+                    drops.remove((int)(Math.random() * drops.size()));
                 }
             }
         } else if(guaranteedItems>0) {

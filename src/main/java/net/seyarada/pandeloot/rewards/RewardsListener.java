@@ -25,23 +25,39 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RewardsListener implements Listener {
 
+    static Map<UUID, Long> preventUseWhenDrop = new HashMap<>();
+
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent e) {
+        if(NMSManager.hasTag(e.getItemDrop().getItemStack(), StringLib.bag)) {
+            preventUseWhenDrop.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());
+        }
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if(e.getAction().equals(Action.PHYSICAL)) return;
+        if(e.getAction() == Action.PHYSICAL) return;
 
-        if(e.getHand().equals(EquipmentSlot.HAND)) {
+        if(e.getHand() == EquipmentSlot.HAND) {
+
+            UUID uuid = e.getPlayer().getUniqueId();
+            if(preventUseWhenDrop.containsKey(uuid)) {
+                long oldTime = preventUseWhenDrop.get(uuid);
+                if( (System.currentTimeMillis()-oldTime)<100 ) {
+                    preventUseWhenDrop.remove(uuid);
+                    return;
+                }
+            }
 
             ItemStack iS = e.getPlayer().getInventory().getItemInMainHand();
             if(NMSManager.hasTag(iS, StringLib.bag)) {
@@ -49,14 +65,13 @@ public class RewardsListener implements Listener {
 
                 iS.setAmount(iS.getAmount()-1);
 
+                Reward reward = new Reward(new RewardLine("lootbag:" + lootBag), e.getPlayer(), null);
+                List<RewardLine> rewardsStringList = new RewardContainer(lootBag, reward).getDrops();
+                List<String> rewards = rewardsStringList.stream().map(rL -> rL.baseLine).collect(Collectors.toList());
 
-                List<String> rewardsStringList = Config.getRewardContainer(lootBag).getStringList("Rewards");
-                List<RewardLine> rewards = rewardsStringList.stream().map(RewardLine::new).collect(Collectors.toList());
-
-                new Manager().fromRewardLine(Collections.singletonList(e.getPlayer()), rewards, null, null);
-
+                new StartDrops(Collections.singletonList(e.getPlayer()), rewards, null, null);
+                e.setCancelled(true);
                 return;
-
             }
 
             if(e.getClickedBlock()==null) return;

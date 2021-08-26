@@ -40,8 +40,7 @@ public class PandeLootChannelHandler_v1_16_R3 extends ChannelDuplexHandler {
 				int id = packetSpawnEntityId.getInt(packet);
 				if(NMSManager.hideItemFromPlayerMap.containsKey(id)) {
 					List<Player> players = NMSManager.hideItemFromPlayerMap.get(id);
-					if(!players.contains(player.getBukkitEntity())) {
-						System.out.println("Stopped sending packet to " + player.displayName);
+					if(players.contains(player.getBukkitEntity())) {
 						return;
 					}
 				}
