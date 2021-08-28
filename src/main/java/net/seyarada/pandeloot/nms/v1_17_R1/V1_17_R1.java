@@ -46,7 +46,6 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -95,12 +94,13 @@ public class V1_17_R1 {
     }
 
     public static void spawnHologram(DamageUtil damageUtil) {
-        UUID uuid = damageUtil.getUUID();
+        final UUID uuid = damageUtil.getUUID();
         for (UUID playerUUID : DamageTracker.get(uuid).keySet()) {
-            Player player = Bukkit.getPlayer(playerUUID);
+            final Player player = Bukkit.getPlayer(playerUUID);
+            if(player == null) continue;
 
-            Location location = Bukkit.getEntity(uuid).getLocation();
-            WorldServer wS = ((CraftWorld) location.getWorld()).getHandle();
+            final Location location = Bukkit.getEntity(uuid).getLocation();
+            final WorldServer wS = ((CraftWorld) location.getWorld()).getHandle();
             double lX = location.getX();
             double lY = location.getY() + 1.2;
             double lZ = location.getZ();
@@ -124,21 +124,18 @@ public class V1_17_R1 {
                 PacketPlayOutSpawnEntity packetPlayOutSpawnEntity = new PacketPlayOutSpawnEntity(armorStand, 1);
                 PacketPlayOutEntityMetadata metadata = new PacketPlayOutEntityMetadata(armorStand.getId(), armorStand.getDataWatcher(), true);
 
-                if (player != null && player.isOnline() && ((CraftPlayer) player).getHandle() != null) {
+                if (player.isOnline() && ((CraftPlayer) player).getHandle() != null) {
                     final PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
                     connection.sendPacket(packetPlayOutSpawnEntity);
                     connection.sendPacket(metadata);
                 }
 
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (player.isOnline()) {
-                            PacketPlayOutEntityDestroy destroy = new PacketPlayOutEntityDestroy(armorStand.getId());
-                            ((CraftPlayer) player).getHandle().b.sendPacket(destroy);
-                        }
+                Bukkit.getScheduler().runTaskLater(PandeLoot.getInstance(), () -> {
+                    if (player.isOnline()) {
+                        PacketPlayOutEntityDestroy destroy = new PacketPlayOutEntityDestroy(armorStand.getId());
+                        ((CraftPlayer) player).getHandle().b.sendPacket(destroy);
                     }
-                }.runTaskLater(PandeLoot.getInstance(), 300);
+                }, 300);
             }
 
         }
