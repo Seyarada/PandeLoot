@@ -8,23 +8,9 @@ import net.minecraft.server.level.EntityPlayer;
 import net.seyarada.pandeloot.nms.NMSManager;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 public class PandeLootChannelHandler_v1_17_R1 extends ChannelDuplexHandler {
-
-    private static final Field packetSpawnEntityId;
-
-    static {
-        Field temp;
-        try {
-            temp = PacketPlayOutSpawnEntity.class.getDeclaredField("a");
-            temp.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            temp = null;
-        }
-        packetSpawnEntityId = temp;
-    }
 
     private final EntityPlayer player;
 
@@ -35,15 +21,13 @@ public class PandeLootChannelHandler_v1_17_R1 extends ChannelDuplexHandler {
     @Override
     public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
 
-        if (packetSpawnEntityId != null) {
-            if (packet instanceof PacketPlayOutSpawnEntity) {
-                int id = packetSpawnEntityId.getInt(packet);
-                if (NMSManager.hideItemFromPlayerMap.containsKey(id)) {
-                    List<Player> players = NMSManager.hideItemFromPlayerMap.get(id);
-                    if (!players.contains(player.getBukkitEntity())) {
-                        System.out.println("Stopped sending packet to " + player.displayName);
-                        return;
-                    }
+        if (packet instanceof PacketPlayOutSpawnEntity) {
+            int id = ((PacketPlayOutSpawnEntity) packet).b();
+            if (NMSManager.hideItemFromPlayerMap.containsKey(id)) {
+                List<Player> players = NMSManager.hideItemFromPlayerMap.get(id);
+                if (!players.contains(player.getBukkitEntity())) {
+                    System.out.println("Stopped sending packet to " + player.displayName);
+                    return;
                 }
             }
         }
