@@ -7,6 +7,7 @@ import net.seyarada.pandeloot.nms.v1_15_R1.V1_15_R1;
 import net.seyarada.pandeloot.nms.v1_16_R1.V1_16_R1;
 import net.seyarada.pandeloot.nms.v1_16_R2.V1_16_R2;
 import net.seyarada.pandeloot.nms.v1_16_R3.V1_16_R3;
+import net.seyarada.pandeloot.nms.v1_17_R1.V1_17_R1;
 import net.seyarada.pandeloot.rewards.Reward;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,6 +27,8 @@ public class NMSManager {
     public static ItemStack removeNBT(ItemStack item, String entity) {
         // String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
+            case "v1_17_R1":
+                return V1_17_R1.removeNBT(item, entity);
             case "v1_16_R3":
                 return V1_16_R3.removeNBT(item, entity);
             case "v1_16_R2":
@@ -45,6 +48,8 @@ public class NMSManager {
     public static ItemStack addNBT(ItemStack item, String key, String value) {
         // String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
+            case "v1_17_R1":
+                return V1_17_R1.addNBT(item, key, value);
             case "v1_16_R3":
                 return V1_16_R3.addNBT(item, key, value);
             case "v1_16_R2":
@@ -64,6 +69,8 @@ public class NMSManager {
     public static boolean hasTag(ItemStack item, String tag) {
         // String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
+            case "v1_17_R1":
+                return V1_17_R1.hasTag(item, tag);
             case "v1_16_R3":
                 return V1_16_R3.hasTag(item, tag);
             case "v1_16_R2":
@@ -83,6 +90,8 @@ public class NMSManager {
     public static String getTag(ItemStack item, String tag) {
         // String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
+            case "v1_17_R1":
+                return V1_17_R1.getTag(item, tag);
             case "v1_16_R3":
                 return V1_16_R3.getTag(item, tag);
             case "v1_16_R2":
@@ -102,6 +111,8 @@ public class NMSManager {
     public static void destroyEntity(int toDestroy, Entity entity) {
         // String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
+            case "v1_17_R1":
+                V1_17_R1.destroyEntity(toDestroy, entity); break;
             case "v1_16_R3":
                 V1_16_R3.destroyEntity(toDestroy, entity); break;
             case "v1_16_R2":
@@ -120,6 +131,8 @@ public class NMSManager {
     public static void spawnHologram(DamageUtil damageUtil) {
         // String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
+            case "v1_17_R1":
+                V1_17_R1.spawnHologram(damageUtil); break;
             case "v1_16_R3":
                 V1_16_R3.spawnHologram(damageUtil); break;
             case "v1_16_R2":
@@ -138,6 +151,8 @@ public class NMSManager {
     public static void spawnLockedHologram(Entity toTrack, Location location, List<String> toDisplay, List<Player> players, int aT, Reward reward) {
         // String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
+            case "v1_17_R1":
+                new V1_17_R1().spawnLockedHologram(toTrack, location, toDisplay, players, aT, reward); break;
             case "v1_16_R3":
                 new V1_16_R3().spawnLockedHologram(toTrack, location, toDisplay, players, aT, reward); break;
             case "v1_16_R2":
@@ -156,6 +171,8 @@ public class NMSManager {
     public static void toast(Player player, String title, String frame, ItemStack icon) {
         // String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         switch (version) {
+            case "v1_17_R1":
+                V1_17_R1.displayToast(player, title, frame, icon); break;
             case "v1_16_R3":
                 V1_16_R3.displayToast(player, title, frame, icon); break;
             case "v1_16_R2":
@@ -167,6 +184,8 @@ public class NMSManager {
 
     public static void injectPlayer(Player player) {
         switch (version) {
+            case "v1_17_R1":
+                V1_17_R1.injectPlayer(player); break;
             case "v1_16_R3":
                 V1_16_R3.injectPlayer(player); break;
             case "v1_16_R2":
@@ -184,6 +203,8 @@ public class NMSManager {
 
     public static void removePlayer(Player player) {
         switch (version) {
+            case "v1_17_R1":
+                V1_17_R1.removePlayer(player); break;
             case "v1_16_R3":
                 V1_16_R3.removePlayer(player); break;
             case "v1_16_R2":
